@@ -1,14 +1,13 @@
-abstract class AdminRoutes {
-  static const LOGIN = '/admin/login';
-  static const DASHBOARD = '/admin/dashboard';
-  static const DOCTORS = '/admin/doctors';
-  static const ADD_DOCTOR = '/admin/doctors/add';
-  static const EDIT_DOCTOR = '/admin/doctors/edit';
-  static const DIAGNOSTICS = '/admin/diagnostics';
-  static const ADD_DIAGNOSTIC = '/admin/diagnostics/add';
-  static const EDIT_DIAGNOSTIC = '/admin/diagnostics/edit';
-  static const APPOINTMENTS = '/admin/appointments';
-  static const DIAGNOSTIC_BOOKINGS = '/admin/diagnostic-bookings';
-  static const USERS = '/admin/users';
-  static const ANALYTICS = '/admin/analytics';
+class AppRoutes {
+  static const LOGIN = '/login';
+  static const DASHBOARD = '/dashboard';
+  static const DOCTORS = '/doctors';
+  static const DOCTORS_ADD = '/doctors/add';
+  static const DOCTORS_EDIT = '/doctors/edit';
+  static const DIAGNOSTICS = '/diagnostics';
+  static const DIAGNOSTICS_ADD = '/diagnostics/add';
+  static const DIAGNOSTICS_EDIT = '/diagnostics/edit';
+  static const APPOINTMENTS = '/appointments';
+  static const USERS = '/users';
+  static const ANALYTICS = '/analytics';
 }

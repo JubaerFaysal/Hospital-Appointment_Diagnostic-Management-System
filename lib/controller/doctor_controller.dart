@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
-import '../../utils/helpers.dart';
 import '../data/models/doctor_model.dart';
-import '../data/services/admin_api_service.dart';
+import '../services/api_services.dart';
+import '../utils/helpers.dart';
 
 class DoctorsController extends GetxController {
-  final AdminApiService _apiService = Get.find<AdminApiService>();
+  final ApiService _apiService = Get.find<ApiService>();
 
   final isLoading = false.obs;
   final doctors = <DoctorModel>[].obs;
@@ -97,9 +97,7 @@ class DoctorsController extends GetxController {
 
     try {
       Helpers.showLoadingDialog();
-
       await _apiService.delete('/doctors/$id');
-
       Helpers.hideLoadingDialog();
       await loadDoctors();
       Helpers.showSuccessSnackbar('Success', 'Doctor deleted successfully');

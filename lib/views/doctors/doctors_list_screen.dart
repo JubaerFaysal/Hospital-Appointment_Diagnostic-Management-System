@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '../../../utils/app_colors.dart';
-import '../../../utils/app_text_styles.dart';
+
 import '../../controller/doctor_controller.dart';
-import '../../routes/admin_routes.dart';
-import '../dashboard/widgets/admin_sidebar.dart';
+import '../../utils/app_colors.dart';
+import '../../utils/app_text_styles.dart';
+import '../../widgets/admin_sidebar.dart';
 
 class DoctorsListScreen extends StatelessWidget {
   const DoctorsListScreen({Key? key}) : super(key: key);
@@ -17,7 +17,7 @@ class DoctorsListScreen extends StatelessWidget {
     return Scaffold(
       body: Row(
         children: [
-          const AdminSidebar(selectedRoute: AdminRoutes.DOCTORS),
+          const AdminSidebar(selectedRoute: '/doctors'),
           Expanded(
             child: Container(
               color: AppColors.background,
@@ -109,7 +109,7 @@ class DoctorsListScreen extends StatelessWidget {
               ),
               SizedBox(width: 16.w),
               ElevatedButton.icon(
-                onPressed: () => Get.toNamed(AdminRoutes.ADD_DOCTOR),
+                onPressed: () => Get.toNamed('/doctors/add'),
                 icon: const Icon(Icons.add),
                 label: const Text('Add Doctor'),
                 style: ElevatedButton.styleFrom(
@@ -170,7 +170,7 @@ class DoctorsListScreen extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.edit, color: AppColors.info),
                         onPressed: () => Get.toNamed(
-                          AdminRoutes.EDIT_DOCTOR,
+                          '/doctors/edit',
                           arguments: doctor,
                         ),
                         tooltip: 'Edit',

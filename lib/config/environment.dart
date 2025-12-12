@@ -1,6 +1,21 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+
 class Environment {
   // API Configuration
-  static const String BASE_URL = 'http://localhost:3000'; // Your NestJS backend
+  static String get BASE_URL {
+    if (kIsWeb) {
+      return 'http://localhost:3000'; // Web
+    } else if (Platform.isAndroid) {
+      return 'http://10.0.2.2:3000'; // Android Emulator
+    } else if (Platform.isIOS) {
+      return 'http://localhost:3000'; // iOS Simulator
+    } else {
+      // Windows, macOS, Linux Desktop
+      return 'http://127.0.0.1:3000'; // Use 127.0.0.1 for desktop
+    }
+  }
 
   static const String API_VERSION = 'v1';
 
@@ -19,4 +34,5 @@ class Environment {
   // Timeouts
   static const int CONNECTION_TIMEOUT = 30000;
   static const int RECEIVE_TIMEOUT = 30000;
+
 }

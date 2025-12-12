@@ -1,0 +1,54 @@
+class AppointmentModel {
+  final int id;
+  final int doctorId;
+  final int patientId;
+  final String doctorName;
+  final String doctorSpecialty;
+  final String patientName;
+  final String patientPhone;
+  final String date;
+  final String timeSlot;
+  final String status;
+  final double? fee;
+
+  AppointmentModel({
+    required this.id,
+    required this.doctorId,
+    required this.patientId,
+    required this.doctorName,
+    required this.doctorSpecialty,
+    required this.patientName,
+    required this.patientPhone,
+    required this.date,
+    required this.timeSlot,
+    required this.status,
+    this.fee,
+  });
+
+  factory AppointmentModel.fromJson(Map<String, dynamic> json) {
+    return AppointmentModel(
+      id: json['id'],
+      doctorId: json['doctorId'] ?? json['doctor_id'],
+      patientId: json['patientId'] ?? json['patient_id'],
+      doctorName: json['doctor']?['name'] ?? 'Unknown Doctor',
+      doctorSpecialty: json['doctor']?['specialty'] ?? 'General',
+      patientName: json['patient']?['name'] ?? 'Unknown Patient',
+      patientPhone: json['patient']?['phone'] ?? 'N/A',
+      date: json['date'] ?? '',
+      timeSlot: json['time_slot'] ?? json['timeSlot'] ?? '',
+      status: json['status'] ?? 'pending',
+      fee: json['doctor']?['fee']?.toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'doctorId': doctorId,
+      'patientId': patientId,
+      'date': date,
+      'time_slot': timeSlot,
+      'status': status,
+    };
+  }
+}

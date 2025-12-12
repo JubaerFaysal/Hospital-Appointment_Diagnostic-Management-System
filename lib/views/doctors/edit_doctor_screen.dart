@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '../../../utils/app_colors.dart';
-import '../../../utils/app_text_styles.dart';
-import '../../../widgets/custom_button.dart';
-import '../../../widgets/custom_textfield.dart';
-import '../../controllers/doctors_controller.dart';
+
+import '../../controller/doctor_controller.dart';
 import '../../data/models/doctor_model.dart';
-import '../dashboard/widgets/admin_sidebar.dart';
-import '../../routes/admin_routes.dart';
+import '../../utils/app_colors.dart';
+import '../../utils/app_text_styles.dart';
+import '../../widgets/admin_sidebar.dart';
+import '../../widgets/custom_textfield.dart';
 
 class EditDoctorScreen extends StatefulWidget {
   const EditDoctorScreen({Key? key}) : super(key: key);
@@ -78,7 +77,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
     return Scaffold(
       body: Row(
         children: [
-          const AdminSidebar(selectedRoute: AdminRoutes.DOCTORS),
+          const AdminSidebar(selectedRoute: '/doctors'),
           Expanded(
             child: Container(
               color: AppColors.background,
