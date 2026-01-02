@@ -1,7 +1,8 @@
-import 'package:admin_panel_web_app/services/api_services.dart';
 import 'package:get/get.dart';
-import '../../utils/helpers.dart';
-import '../data/models/user_model.dart';
+import 'package:dio/dio.dart';
+import '../services/api_services.dart';
+import '../utils/helpers.dart';
+import '../models/user_model.dart';
 
 class UsersController extends GetxController {
   final ApiService _apiService = Get.find<ApiService>();
@@ -19,11 +20,14 @@ class UsersController extends GetxController {
   Future<void> loadUsers() async {
     try {
       isLoading.value = true;
+      final response = await _apiService.get('/admin-auth/users');
 
-      // Mock data - Replace with actual API call
-      users.value = _getMockUsers();
-      filteredUsers.value = users;
-
+      if (response.data != null) {
+        users.value = (response.data as List)
+            .map((json) => UserModel.fromJson(json))
+            .toList();
+        filteredUsers.value = users;
+      }
     } catch (e) {
       print('Error loading users: $e');
       Helpers.showErrorSnackbar('Error', 'Failed to load users');
@@ -37,32 +41,58 @@ class UsersController extends GetxController {
       filteredUsers.value = users;
     } else {
       filteredUsers.value = users.where((user) {
-        return user.fullName.toLowerCase().contains(query.toLowerCase()) ||
-            user.email.toLowerCase().contains(query.toLowerCase());
+        return user.name.toLowerCase().contains(query.toLowerCase()) ||
+            user.phone.contains(query);
       }).toList();
     }
   }
 
-  List<UserModel> _getMockUsers() {
-    return [
-      UserModel(
-        id: 1,
-        fullName: 'John Doe',
-        email: 'john@example.com',
-        phone: '01712345678',
-        role: 'patient',
-        isActive: true,
-        createdAt: '2024-01-01',
-      ),
-      UserModel(
-        id: 2,
-        fullName: 'Jane Smith',
-        email: 'jane@example.com',
-        phone: '01812345679',
-        role: 'patient',
-        isActive: true,
-        createdAt: '2024-01-02',
-      ),
-    ];
+  Future<void> deleteUser(int id) async {
+    final confirmed = await Helpers.showConfirmDialog(
+      title: 'Delete User',
+      message: 'Are you sure you want to delete this user?',
+      confirmText: 'Delete',
+    );
+
+    if (!confirmed) return;
+
+    try {
+      Helpers.showLoadingDialog();
+      await _apiService.delete('/admin-auth/users/$id');
+      Helpers.hideLoadingDialog();
+      await loadUsers();
+      Helpers.showSuccessSnackbar('Success', 'User deleted successfully');
+    } on DioException catch (e) {
+      Helpers.hideLoadingDialog();
+      Helpers.showErrorSnackbar(
+        'Error',
+        e.response?.data['message'] ?? 'Failed to delete user',
+      );
+    }
+  }
+
+  Future<void> updateUser(int id, Map<String, dynamic> data) async {
+    try {
+      Helpers.showLoadingDialog();
+
+      final response = await _apiService.put(
+        '/admin-auth/users/$id',
+        data: data,
+      );
+
+      Helpers.hideLoadingDialog();
+
+      if (response.statusCode == 200) {
+        await loadUsers();
+        Get.back();
+        Helpers.showSuccessSnackbar('Success', 'User updated successfully');
+      }
+    } on DioException catch (e) {
+      Helpers.hideLoadingDialog();
+      Helpers.showErrorSnackbar(
+        'Error',
+        e.response?.data['message'] ?? 'Failed to update user',
+      );
+    }
   }
 }

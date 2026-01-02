@@ -2,24 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import '../controller/appointments_controller.dart';
-import '../routes/admin_routes.dart';
-import '../utils/app_colors.dart';
-import '../utils/app_text_styles.dart';
-import '../widgets/status_badge.dart';
-import '../widgets/admin_sidebar.dart';
+import '../../controller/diagnostic_booking_controller.dart';
+import '../../routes/admin_routes.dart';
+import '../../utils/app_colors.dart';
+import '../../utils/app_text_styles.dart';
+import '../../widgets/status_badge.dart';
+import '../../widgets/admin_sidebar.dart';
 
-class AppointmentsListScreen extends StatelessWidget {
-  const AppointmentsListScreen({Key? key}) : super(key: key);
+class DiagnosticBookingsListScreen extends StatelessWidget {
+  const DiagnosticBookingsListScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AppointmentsController());
+    final controller = Get.put(DiagnosticBookingsController());
 
     return Scaffold(
       body: Row(
         children: [
-          const AdminSidebar(selectedRoute: AdminRoutes.APPOINTMENTS),
+           AdminSidebar(selectedRoute: AdminRoutes.DIAGNOSTIC_BOOKINGS),
           Expanded(
             child: Container(
               color: AppColors.background,
@@ -34,19 +34,19 @@ class AppointmentsListScreen extends StatelessWidget {
                         return const Center(child: CircularProgressIndicator());
                       }
 
-                      if (controller.filteredAppointments.isEmpty) {
+                      if (controller.filteredBookings.isEmpty) {
                         return Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                Icons.calendar_today_outlined,
+                                Icons.science_outlined,
                                 size: 80.sp,
                                 color: AppColors.textHint,
                               ),
                               SizedBox(height: 16.h),
                               Text(
-                                'No appointments found',
+                                'No diagnostic bookings found',
                                 style: AppTextStyles.h4,
                               ),
                             ],
@@ -54,7 +54,7 @@ class AppointmentsListScreen extends StatelessWidget {
                         );
                       }
 
-                      return _buildAppointmentsTable(controller);
+                      return _buildBookingsTable(controller);
                     }),
                   ),
                 ],
@@ -66,7 +66,7 @@ class AppointmentsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTopBar(AppointmentsController controller) {
+  Widget _buildTopBar(DiagnosticBookingsController controller) {
     return Container(
       padding: EdgeInsets.all(24.w),
       color: Colors.white,
@@ -77,12 +77,12 @@ class AppointmentsListScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Appointments Management',
+                'Diagnostic Bookings Management',
                 style: AppTextStyles.h3.copyWith(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 4.h),
               Text(
-                'Manage all patient appointments',
+                'Manage all diagnostic test bookings',
                 style: AppTextStyles.body2.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -95,7 +95,7 @@ class AppointmentsListScreen extends StatelessWidget {
                 width: 300.w,
                 child: TextField(
                   decoration: InputDecoration(
-                    hintText: 'Search by patient, doctor, phone...',
+                    hintText: 'Search by patient, test, phone...',
                     prefixIcon: const Icon(Icons.search),
                     filled: true,
                     fillColor: AppColors.background,
@@ -108,12 +108,12 @@ class AppointmentsListScreen extends StatelessWidget {
                       vertical: 12.h,
                     ),
                   ),
-                  onChanged: controller.searchAppointments,
+                  onChanged: controller.searchBookings,
                 ),
               ),
               SizedBox(width: 16.w),
               IconButton(
-                onPressed: () => controller.loadAppointments(),
+                onPressed: () => controller.loadBookings(),
                 icon: const Icon(Icons.refresh),
                 tooltip: 'Refresh',
                 iconSize: 28.sp,
@@ -125,7 +125,7 @@ class AppointmentsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsBar(AppointmentsController controller) {
+  Widget _buildStatsBar(DiagnosticBookingsController controller) {
     return Obx(() => Container(
       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
       color: Colors.white,
@@ -133,32 +133,32 @@ class AppointmentsListScreen extends StatelessWidget {
         children: [
           _buildStatItem(
             'Total',
-            controller.totalAppointments.toString(),
+            controller.totalBookings.toString(),
             AppColors.info,
           ),
           SizedBox(width: 24.w),
           _buildStatItem(
             'Pending',
             controller.pendingCount.toString(),
-            AppColors.warning,
+            AppColors.pending,
           ),
           SizedBox(width: 24.w),
           _buildStatItem(
-            'Approved',
-            controller.approvedCount.toString(),
-            AppColors.success,
+            'Confirmed',
+            controller.confirmedCount.toString(),
+            AppColors.approved,
           ),
           SizedBox(width: 24.w),
           _buildStatItem(
             'Completed',
             controller.completedCount.toString(),
-            AppColors.info,
+            AppColors.completed,
           ),
           SizedBox(width: 24.w),
           _buildStatItem(
-            'Rejected',
-            controller.rejectedCount.toString(),
-            AppColors.error,
+            'Cancelled',
+            controller.cancelledCount.toString(),
+            AppColors.cancelled,
           ),
         ],
       ),
@@ -196,7 +196,7 @@ class AppointmentsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterBar(AppointmentsController controller) {
+  Widget _buildFilterBar(DiagnosticBookingsController controller) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
       color: Colors.white,
@@ -213,18 +213,18 @@ class AppointmentsListScreen extends StatelessWidget {
           SizedBox(width: 12.w),
           _buildFilterChip(controller, 'Pending', 'pending'),
           SizedBox(width: 12.w),
-          _buildFilterChip(controller, 'Approved', 'approved'),
+          _buildFilterChip(controller, 'Confirmed', 'confirmed'),
           SizedBox(width: 12.w),
           _buildFilterChip(controller, 'Completed', 'completed'),
           SizedBox(width: 12.w),
-          _buildFilterChip(controller, 'Rejected', 'rejected'),
+          _buildFilterChip(controller, 'Cancelled', 'cancelled'),
         ],
       )),
     );
   }
 
   Widget _buildFilterChip(
-      AppointmentsController controller,
+      DiagnosticBookingsController controller,
       String label,
       String value,
       ) {
@@ -233,20 +233,17 @@ class AppointmentsListScreen extends StatelessWidget {
       label: Text(label),
       selected: isSelected,
       onSelected: (selected) => controller.filterByStatus(value),
-      backgroundColor: Colors.white,
-      selectedColor: AppColors.primary,
+      selectedColor: AppColors.primary.withOpacity(0.2),
+      checkmarkColor: AppColors.primary,
+      backgroundColor: Colors.grey[200],
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : AppColors.textPrimary,
+        color: isSelected ? AppColors.primary : AppColors.textSecondary,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-        fontSize: 13.sp,
-      ),
-      side: BorderSide(
-        color: isSelected ? AppColors.primary : AppColors.border,
       ),
     );
   }
 
-  Widget _buildAppointmentsTable(AppointmentsController controller) {
+  Widget _buildBookingsTable(DiagnosticBookingsController controller) {
     return Container(
       margin: EdgeInsets.all(24.w),
       decoration: BoxDecoration(
@@ -260,104 +257,100 @@ class AppointmentsListScreen extends StatelessWidget {
             DataColumn(label: Text('ID', style: AppTextStyles.subtitle1)),
             DataColumn(label: Text('Patient', style: AppTextStyles.subtitle1)),
             DataColumn(label: Text('Phone', style: AppTextStyles.subtitle1)),
-            DataColumn(label: Text('Doctor', style: AppTextStyles.subtitle1)),
-            DataColumn(label: Text('Specialty', style: AppTextStyles.subtitle1)),
-            DataColumn(label: Text('Date', style: AppTextStyles.subtitle1)),
-            DataColumn(label: Text('Time Slot', style: AppTextStyles.subtitle1)),
-            DataColumn(label: Text('Fee', style: AppTextStyles.subtitle1)),
+            DataColumn(label: Text('Test Name', style: AppTextStyles.subtitle1)),
+            DataColumn(label: Text('Category', style: AppTextStyles.subtitle1)),
+            DataColumn(label: Text('Schedule Date', style: AppTextStyles.subtitle1)),
             DataColumn(label: Text('Status', style: AppTextStyles.subtitle1)),
             DataColumn(label: Text('Actions', style: AppTextStyles.subtitle1)),
           ],
-          rows: controller.filteredAppointments.map((appointment) {
-            final date = DateTime.parse(appointment.date);
+          rows: controller.filteredBookings.map((booking) {
+            final date = DateTime.parse(booking.scheduleDate);
             final formattedDate = DateFormat('dd MMM yyyy').format(date);
 
             return DataRow(
               cells: [
-                DataCell(Text(appointment.id.toString())),
+                DataCell(Text(booking.id.toString())),
                 DataCell(
                   SizedBox(
                     width: 120.w,
                     child: Text(
-                      appointment.patientName,
+                      booking.patientName,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
-                DataCell(Text(appointment.patientPhone)),
+                DataCell(Text(booking.patientPhone)),
                 DataCell(
                   SizedBox(
-                    width: 150.w,
+                    width: 200.w,
                     child: Text(
-                      appointment.doctorName,
+                      booking.diagnosticName,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
-                DataCell(Text(appointment.doctorSpecialty)),
+                DataCell(Text(booking.diagnosticCategory)),
                 DataCell(Text(formattedDate)),
-                DataCell(Text(appointment.timeSlot)),
-                DataCell(
-                  Text(
-                    appointment.fee != null
-                        ? '৳${appointment.fee!.toStringAsFixed(0)}'
-                        : 'N/A',
-                  ),
-                ),
-                DataCell(StatusBadge(status: appointment.status)),
+                DataCell(StatusBadge(status: booking.status)),
                 DataCell(
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.visibility, color: AppColors.info),
-                        onPressed: () => _showAppointmentDetails(appointment),
+                        onPressed: () => _showBookingDetails(booking),
                         tooltip: 'View Details',
                       ),
-                      if (appointment.status == 'pending')
+                      if (booking.status == 'pending')
                         PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert),
                           onSelected: (value) {
-                            controller.updateAppointmentStatus(
-                              appointment.id,
+                            controller.updateBookingStatus(
+                              booking.id,
                               value,
                             );
                           },
                           itemBuilder: (context) => [
                             const PopupMenuItem(
-                              value: 'approved',
+                              value: 'confirmed',
                               child: Row(
                                 children: [
                                   Icon(Icons.check_circle, color: AppColors.success),
                                   SizedBox(width: 8),
-                                  Text('Approve'),
+                                  Text('Confirm'),
                                 ],
                               ),
                             ),
                             const PopupMenuItem(
-                              value: 'rejected',
+                              value: 'cancelled',
                               child: Row(
                                 children: [
                                   Icon(Icons.cancel, color: AppColors.error),
                                   SizedBox(width: 8),
-                                  Text('Reject'),
+                                  Text('Cancel'),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                      if (appointment.status == 'approved')
+                      if (booking.status == 'confirmed')
                         IconButton(
                           icon: const Icon(Icons.done_all, color: AppColors.success),
-                          onPressed: () => controller.updateAppointmentStatus(
-                            appointment.id,
+                          onPressed: () => controller.updateBookingStatus(
+                            booking.id,
                             'completed',
                           ),
                           tooltip: 'Mark Completed',
                         ),
+                      if (booking.status == 'pending')
+                        IconButton(
+                          icon: const Icon(Icons.close, color: AppColors.error),
+                          onPressed: () => _showCancelDialog(controller, booking.id),
+                          tooltip: 'Cancel with Reason',
+                        ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: AppColors.error),
-                        onPressed: () => controller.deleteAppointment(appointment.id),
+                        onPressed: () => controller.deleteBooking(booking.id),
                         tooltip: 'Delete',
                       ),
                     ],
@@ -371,8 +364,8 @@ class AppointmentsListScreen extends StatelessWidget {
     );
   }
 
-  void _showAppointmentDetails(appointment) {
-    final date = DateTime.parse(appointment.date);
+  void _showBookingDetails(booking) {
+    final date = DateTime.parse(booking.scheduleDate);
     final formattedDate = DateFormat('EEEE, dd MMM yyyy').format(date);
 
     Get.dialog(
@@ -391,7 +384,7 @@ class AppointmentsListScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Appointment Details',
+                    'Booking Details',
                     style: AppTextStyles.h4.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -405,29 +398,132 @@ class AppointmentsListScreen extends StatelessWidget {
               SizedBox(height: 24.h),
 
               _buildDetailSection('Patient Information', [
-                _buildDetailRow('Name', appointment.patientName),
-                _buildDetailRow('Phone', appointment.patientPhone),
+                _buildDetailRow('Name', booking.patientName),
+                _buildDetailRow('Phone', booking.patientPhone),
               ]),
 
               SizedBox(height: 20.h),
 
-              _buildDetailSection('Doctor Information', [
-                _buildDetailRow('Name', appointment.doctorName),
-                _buildDetailRow('Specialty', appointment.doctorSpecialty),
-                _buildDetailRow('Fee', '৳${appointment.fee?.toStringAsFixed(0) ?? 'N/A'}'),
+              _buildDetailSection('Test Information', [
+                _buildDetailRow('Test Name', booking.diagnosticName),
+                _buildDetailRow('Category', booking.diagnosticCategory),
               ]),
 
               SizedBox(height: 20.h),
 
-              _buildDetailSection('Appointment Details', [
-                _buildDetailRow('Date', formattedDate),
-                _buildDetailRow('Time Slot', appointment.timeSlot),
+              _buildDetailSection('Booking Details', [
+                _buildDetailRow('Schedule Date', formattedDate),
                 _buildDetailRow('Status', ''),
               ]),
 
               Padding(
                 padding: EdgeInsets.only(left: 16.w, top: 8.h),
-                child: StatusBadge(status: appointment.status, fontSize: 13.sp),
+                child: StatusBadge(status: booking.status, fontSize: 13.sp),
+              ),
+
+              if (booking.notes != null) ...[
+                SizedBox(height: 20.h),
+                _buildDetailSection('Notes', [
+                  Padding(
+                    padding: EdgeInsets.only(left: 16.w),
+                    child: Text(
+                      booking.notes!,
+                      style: AppTextStyles.body2,
+                    ),
+                  ),
+                ]),
+              ],
+
+              if (booking.cancellationReason != null) ...[
+                SizedBox(height: 20.h),
+                _buildDetailSection('Cancellation Reason', [
+                  Padding(
+                    padding: EdgeInsets.only(left: 16.w),
+                    child: Text(
+                      booking.cancellationReason!,
+                      style: AppTextStyles.body2.copyWith(
+                        color: AppColors.error,
+                      ),
+                    ),
+                  ),
+                ]),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCancelDialog(DiagnosticBookingsController controller, int bookingId) {
+    final reasonController = TextEditingController();
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Container(
+          width: 450.w,
+          padding: EdgeInsets.all(24.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Cancel Booking',
+                style: AppTextStyles.h4.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'Please provide a reason for cancellation:',
+                style: AppTextStyles.body2,
+              ),
+              SizedBox(height: 16.h),
+              TextField(
+                controller: reasonController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Enter cancellation reason...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+              ),
+              SizedBox(height: 24.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  OutlinedButton(
+                    onPressed: () {
+                      reasonController.dispose();
+                      Get.back();
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                  SizedBox(width: 16.w),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (reasonController.text.trim().isEmpty) {
+                        Get.snackbar(
+                          'Error',
+                          'Please provide a cancellation reason',
+                          backgroundColor: AppColors.error,
+                          colorText: Colors.white,
+                        );
+                        return;
+                      }
+                      controller.cancelBooking(bookingId, reasonController.text.trim());
+                      reasonController.dispose();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.error,
+                    ),
+                    child: const Text('Confirm Cancel'),
+                  ),
+                ],
               ),
             ],
           ),

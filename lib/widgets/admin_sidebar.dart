@@ -8,10 +8,7 @@ import '../utils/app_text_styles.dart';
 class AdminSidebar extends StatelessWidget {
   final String selectedRoute;
 
-  const AdminSidebar({
-    super.key,
-    required this.selectedRoute,
-  });
+  const AdminSidebar({super.key, required this.selectedRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +25,7 @@ class AdminSidebar extends StatelessWidget {
             padding: EdgeInsets.all(16.w),
             child: Row(
               children: [
-                Icon(
-                  Icons.local_hospital,
-                  color: Colors.white,
-                  size: 32.sp,
-                ),
+                Icon(Icons.local_hospital, color: Colors.white, size: 32.sp),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Text(
@@ -70,15 +63,16 @@ class AdminSidebar extends StatelessWidget {
                   route: '/diagnostics',
                 ),
                 menuItem(
+                  icon: Icons.assignment,
+                  title: 'Diagnostic Bookings',
+                  route: '/diagnostic-bookings',
+                ),
+                menuItem(
                   icon: Icons.calendar_today,
                   title: 'Appointments',
                   route: '/appointments',
                 ),
-                // menuItem(
-                //   icon: Icons.people,
-                //   title: 'Users',
-                //   route: '/users',
-                // ),
+                menuItem(icon: Icons.people, title: 'Users', route: '/users'),
                 // menuItem(
                 //   icon: Icons.analytics,
                 //   title: 'Analytics',
@@ -119,11 +113,7 @@ class AdminSidebar extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
       child: ListTile(
-        leading: Icon(
-          icon,
-          color: Colors.white,
-          size: 22.sp,
-        ),
+        leading: Icon(icon, color: Colors.white, size: 22.sp),
         title: Text(
           title,
           style: AppTextStyles.body1.copyWith(
@@ -133,9 +123,7 @@ class AdminSidebar extends StatelessWidget {
         ),
         selected: isSelected,
         selectedTileColor: Colors.white.withOpacity(0.15),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.r),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
         onTap: () => Get.toNamed(route),
         hoverColor: Colors.white.withOpacity(0.1),
       ),

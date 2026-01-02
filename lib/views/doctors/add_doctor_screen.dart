@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../controller/doctor_controller.dart';
-import '../../data/models/doctor_model.dart';
+import '../../models/doctor_model.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_text_styles.dart';
 import '../../widgets/admin_sidebar.dart';

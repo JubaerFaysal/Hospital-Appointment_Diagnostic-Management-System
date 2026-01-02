@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           initialBinding: InitialBinding(),
-          initialRoute: AppRoutes.LOGIN,
+          initialRoute: AdminRoutes.LOGIN,
           getPages: AdminPages.routes,
           defaultTransition: Transition.fadeIn,
           transitionDuration: const Duration(milliseconds: 300),

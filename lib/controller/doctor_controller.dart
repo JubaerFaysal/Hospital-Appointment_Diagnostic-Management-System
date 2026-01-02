@@ -1,6 +1,9 @@
-import 'package:get/get.dart';
+import 'package:admin_panel_web_app/main.dart';
 import 'package:dio/dio.dart';
-import '../data/models/doctor_model.dart';
+import 'package:get/get.dart';
+
+import '../config/api_endpoints.dart';
+import '../models/doctor_model.dart';
 import '../services/api_services.dart';
 import '../utils/helpers.dart';
 
@@ -20,19 +23,38 @@ class DoctorsController extends GetxController {
   Future<void> loadDoctors() async {
     try {
       isLoading.value = true;
-      final response = await _apiService.get('/doctors');
 
-      if (response.data != null) {
-        doctors.value = (response.data as List)
-            .map((json) => DoctorModel.fromJson(json))
-            .toList();
+      // ✅ FIX: Use correct endpoint with timeout safety
+      final response = await _apiService
+          .get(ApiEndpoints.DOCTORS)
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () {
+              throw Exception('Request timeout - took more than 30 seconds');
+            },
+          );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final list = response.data as List;
+        doctors.value = list.map((json) => DoctorModel.fromJson(json)).toList();
         filteredDoctors.value = doctors;
+        logger.i('✅ Loaded ${doctors.length} doctors successfully');
+      } else {
+        Helpers.showErrorSnackbar('Error', 'Failed to load doctors');
       }
+    } on DioException catch (e) {
+      String errorMsg = 'Failed to load doctors';
+      if (e.type == DioExceptionType.connectionTimeout) {
+        errorMsg = 'Connection timeout';
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        errorMsg = 'Server response timeout';
+      }
+      Helpers.showErrorSnackbar('Error', errorMsg);
     } catch (e) {
-      print('Error loading doctors: $e');
       Helpers.showErrorSnackbar('Error', 'Failed to load doctors');
     } finally {
       isLoading.value = false;
+      logger.i('✅ Loading state reset to false');
     }
   }
 
@@ -40,24 +62,24 @@ class DoctorsController extends GetxController {
     try {
       Helpers.showLoadingDialog();
 
+      // ✅ FIX: Use correct endpoint (POST to /admin-auth/doctors)
       final response = await _apiService.post(
-        '/doctors',
+        ApiEndpoints.DOCTORS,
         data: doctor.toJson(),
       );
 
-      Helpers.hideLoadingDialog();
-
       if (response.statusCode == 201 || response.statusCode == 200) {
         await loadDoctors();
-        Get.back();
+        Get.back(); // Close form
         Helpers.showSuccessSnackbar('Success', 'Doctor added successfully');
       }
     } on DioException catch (e) {
-      Helpers.hideLoadingDialog();
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to add doctor',
       );
+    } finally {
+      Helpers.hideLoadingDialog();
     }
   }
 
@@ -65,24 +87,24 @@ class DoctorsController extends GetxController {
     try {
       Helpers.showLoadingDialog();
 
-      final response = await _apiService.put(
-        '/doctors/$id',
+      // ✅ FIX: Use PATCH method and correct endpoint
+      final response = await _apiService.patch(
+        ApiEndpoints.doctorById(id),
         data: doctor.toJson(),
       );
 
-      Helpers.hideLoadingDialog();
-
       if (response.statusCode == 200) {
         await loadDoctors();
-        Get.back();
+        Get.back(); // Close form
         Helpers.showSuccessSnackbar('Success', 'Doctor updated successfully');
       }
     } on DioException catch (e) {
-      Helpers.hideLoadingDialog();
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to update doctor',
       );
+    } finally {
+      Helpers.hideLoadingDialog();
     }
   }
 
@@ -97,16 +119,19 @@ class DoctorsController extends GetxController {
 
     try {
       Helpers.showLoadingDialog();
-      await _apiService.delete('/doctors/$id');
-      Helpers.hideLoadingDialog();
+
+      await _apiService.delete(ApiEndpoints.doctorById(id));
+
       await loadDoctors();
+      Get.back();
       Helpers.showSuccessSnackbar('Success', 'Doctor deleted successfully');
     } on DioException catch (e) {
-      Helpers.hideLoadingDialog();
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to delete doctor',
       );
+    } finally {
+      Helpers.hideLoadingDialog();
     }
   }
 

@@ -1,75 +1,50 @@
-import 'package:admin_panel_web_app/views/analytics/dashboard_screen.dart';
-import 'package:admin_panel_web_app/views/auth/login_screen.dart';
 import 'package:get/get.dart';
-import '../views/appointments_list_screen.dart';
-import '../views/diagnostics/diagnostic_list_screen.dart';
-import '../views/doctors/doctors_list_screen.dart';
-import '../views/doctors/add_doctor_screen.dart';
-import '../views/doctors/edit_doctor_screen.dart';
-import '../views/diagnostics/add_diagnostic_screen.dart';
-import '../views/diagnostics/edit_diagnostic_screen.dart';
-import '../views/users/users_list_screen.dart';
+
 import '../views/analytics/analytics_screen.dart';
+import '../views/analytics/dashboard_screen.dart';
+import '../views/appointments_list_screen.dart';
+import '../views/auth/login_screen.dart';
+import '../views/diagnostic-booking/diagnostic_booking_list_screen.dart';
+import '../views/diagnostics/add_diagnostic_screen.dart';
+import '../views/diagnostics/diagnostic_list_screen.dart';
+import '../views/diagnostics/edit_diagnostic_screen.dart';
+import '../views/doctors/add_doctor_screen.dart';
+import '../views/doctors/doctors_list_screen.dart';
+import '../views/doctors/edit_doctor_screen.dart';
+import '../views/users/users_list_screen.dart';
 import 'admin_routes.dart';
 
 class AdminPages {
   static final routes = [
-    // Auth
+    GetPage(name: AdminRoutes.LOGIN, page: () => const LoginScreen()),
+    GetPage(name: AdminRoutes.DASHBOARD, page: () => const DashboardScreen()),
+    GetPage(name: AdminRoutes.DOCTORS, page: () => const DoctorsListScreen()),
+    GetPage(name: AdminRoutes.DOCTORS_ADD, page: () => const AddDoctorScreen()),
     GetPage(
-      name: AppRoutes.LOGIN,
-      page: () => const LoginScreen(),
-    ),
-
-    // Dashboard
-    GetPage(
-      name: AppRoutes.DASHBOARD,
-      page: () => const DashboardScreen(),
-    ),
-
-    // Doctors
-    GetPage(
-      name: AppRoutes.DOCTORS,
-      page: () => const DoctorsListScreen(),
-    ),
-    GetPage(
-      name: AppRoutes.DIAGNOSTICS_ADD,
-      page: () => const AddDoctorScreen(),
-    ),
-    GetPage(
-      name: AppRoutes.DOCTORS_EDIT,
+      name: AdminRoutes.DOCTORS_EDIT,
       page: () => const EditDoctorScreen(),
     ),
-
-    // Diagnostics
     GetPage(
-      name: AppRoutes.DIAGNOSTICS,
+      name: AdminRoutes.DIAGNOSTICS,
       page: () => const DiagnosticsListScreen(),
     ),
     GetPage(
-      name: AppRoutes.DIAGNOSTICS_ADD,
+      name: AdminRoutes.DIAGNOSTIC_BOOKINGS,
+      page: () => const DiagnosticBookingsListScreen(),
+    ),
+    GetPage(
+      name: AdminRoutes.DIAGNOSTICS_ADD,
       page: () => const AddDiagnosticScreen(),
     ),
     GetPage(
-      name: AppRoutes.DIAGNOSTICS_EDIT,
+      name: AdminRoutes.DIAGNOSTICS_EDIT,
       page: () => const EditDiagnosticScreen(),
     ),
-
-    // Appointments
     GetPage(
-      name: AppRoutes.APPOINTMENTS,
+      name: AdminRoutes.APPOINTMENTS,
       page: () => const AppointmentsListScreen(),
     ),
-
-    // Users
-    GetPage(
-      name: AppRoutes.USERS,
-      page: () => const UsersListScreen(),
-    ),
-
-    // Analytics
-    GetPage(
-      name: AppRoutes.ANALYTICS,
-      page: () => const AnalyticsScreen(),
-    ),
+    GetPage(name: AdminRoutes.USERS, page: () => const UsersListScreen()),
+    GetPage(name: AdminRoutes.ANALYTICS, page: () => const AnalyticsScreen()),
   ];
 }

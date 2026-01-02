@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import '../../../utils/app_colors.dart';
-import '../../../utils/app_text_styles.dart';
+
 import '../../routes/admin_routes.dart';
+import '../../utils/app_colors.dart';
+import '../../utils/app_text_styles.dart';
 import '../../widgets/admin_sidebar.dart';
 import '../../widgets/dashboard_card.dart';
 
 class AnalyticsScreen extends StatelessWidget {
-  const AnalyticsScreen({Key? key}) : super(key: key);
+  const AnalyticsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
-          const AdminSidebar(selectedRoute: AppRoutes.ANALYTICS),
+          const AdminSidebar(selectedRoute: AdminRoutes.ANALYTICS),
           Expanded(
             child: Container(
               color: AppColors.background,
@@ -187,15 +187,10 @@ class AnalyticsScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: AppTextStyles.h4.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTextStyles.h4.copyWith(fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 4.h),
-          Text(
-            subtitle,
-            style: AppTextStyles.caption,
-          ),
+          Text(subtitle, style: AppTextStyles.caption),
           SizedBox(height: 24.h),
           Container(
             height: 200.h,
@@ -204,11 +199,18 @@ class AnalyticsScreen extends StatelessWidget {
               color: AppColors.background,
               borderRadius: BorderRadius.circular(8.r),
             ),
-            child: Text(
-              'Chart Placeholder',
-              style: AppTextStyles.body2.copyWith(
-                color: AppColors.textHint,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.bar_chart, size: 48.sp, color: AppColors.textHint),
+                SizedBox(height: 12.h),
+                Text(
+                  'Chart Placeholder',
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppColors.textHint,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

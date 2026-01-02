@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import '../config/environment.dart';
 import '../services/api_services.dart';
 import '../services/storage_services.dart';
 import '../utils/helpers.dart';
@@ -25,6 +24,7 @@ class AuthController extends GetxController {
   Future<void> login(String email, String password) async {
     try {
       isLoading.value = true;
+      Helpers.showLoadingDialog();
 
       final response = await apiService.post(
         '/admin-auth/login',
@@ -33,6 +33,8 @@ class AuthController extends GetxController {
           'password': password,
         },
       );
+
+      Helpers.hideLoadingDialog();
 
       if (response.data['success'] == true) {
         await storageService.saveToken(response.data['token']);
@@ -49,6 +51,7 @@ class AuthController extends GetxController {
         );
       }
     } catch (e) {
+      Helpers.hideLoadingDialog();
       print('Login error: $e');
       Helpers.showErrorSnackbar('Error', 'Invalid email or password');
     } finally {

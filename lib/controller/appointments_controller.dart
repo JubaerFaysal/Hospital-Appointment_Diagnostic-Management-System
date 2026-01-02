@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
-import '../data/models/appointment_model.dart';
+import '../config/api_endpoints.dart';
+import '../models/appointment_model.dart';
 import '../services/api_services.dart';
 import '../utils/helpers.dart';
-
 
 class AppointmentsController extends GetxController {
   final ApiService _apiService = Get.find<ApiService>();
@@ -22,10 +22,17 @@ class AppointmentsController extends GetxController {
   Future<void> loadAppointments() async {
     try {
       isLoading.value = true;
-      final response = await _apiService.get('/appointments');
+
+      // ✅ FIX: Use correct endpoint
+      final response = await _apiService.get(ApiEndpoints.APPOINTMENTS);
 
       if (response.data != null) {
-        appointments.value = (response.data as List)
+        // ✅ Check if response has pagination structure
+        final data = response.data is Map && response.data.containsKey('data')
+            ? response.data['data']
+            : response.data;
+
+        appointments.value = (data as List)
             .map((json) => AppointmentModel.fromJson(json))
             .toList();
 
@@ -77,24 +84,23 @@ class AppointmentsController extends GetxController {
     try {
       Helpers.showLoadingDialog();
 
-      // TODO: Update this endpoint based on your backend API
-      final response = await _apiService.put(
-        '/appointments/$id',
+      // ✅ FIX: Use PATCH method and correct endpoint
+      final response = await _apiService.patch(
+        ApiEndpoints.appointmentById(id),
         data: {'status': newStatus},
       );
-
-      Helpers.hideLoadingDialog();
 
       if (response.statusCode == 200) {
         await loadAppointments();
         Helpers.showSuccessSnackbar('Success', 'Appointment status updated');
       }
     } on DioException catch (e) {
-      Helpers.hideLoadingDialog();
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to update status',
       );
+    } finally {
+      Helpers.hideLoadingDialog();
     }
   }
 
@@ -110,17 +116,18 @@ class AppointmentsController extends GetxController {
     try {
       Helpers.showLoadingDialog();
 
-      await _apiService.delete('/appointments/$id');
+      // ✅ FIX: Use correct endpoint
+      await _apiService.delete(ApiEndpoints.appointmentById(id));
 
-      Helpers.hideLoadingDialog();
       await loadAppointments();
       Helpers.showSuccessSnackbar('Success', 'Appointment deleted successfully');
     } on DioException catch (e) {
-      Helpers.hideLoadingDialog();
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to delete appointment',
       );
+    } finally {
+      Helpers.hideLoadingDialog();
     }
   }
 

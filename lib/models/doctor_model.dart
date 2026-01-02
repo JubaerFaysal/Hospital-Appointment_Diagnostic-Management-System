@@ -47,7 +47,6 @@ class DoctorModel {
 
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
       'name': name,
       'degrees': degrees,
       'specialty': specialty,
@@ -58,6 +57,7 @@ class DoctorModel {
       'biography': biography,
       'languages': languages,
       'slots': slots,
+      'available_slots': null,
     };
   }
 }

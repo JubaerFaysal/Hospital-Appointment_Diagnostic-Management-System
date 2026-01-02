@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
-import '../data/models/diagnostic_model.dart';
+import '../config/api_endpoints.dart';
+import '../models/diagnostic_model.dart';
 import '../services/api_services.dart';
 import '../utils/helpers.dart';
 
@@ -20,7 +21,9 @@ class DiagnosticsController extends GetxController {
   Future<void> loadDiagnostics() async {
     try {
       isLoading.value = true;
-      final response = await _apiService.get('/diagnostics');
+
+      // ✅ FIX: Use correct endpoint
+      final response = await _apiService.get(ApiEndpoints.DIAGNOSTICS);
 
       if (response.data != null) {
         diagnostics.value = (response.data as List)
@@ -40,24 +43,24 @@ class DiagnosticsController extends GetxController {
     try {
       Helpers.showLoadingDialog();
 
+      // ✅ FIX: Use correct endpoint (POST to /admin-auth/diagnostics)
       final response = await _apiService.post(
-        '/diagnostics/create',
+        ApiEndpoints.DIAGNOSTICS,
         data: diagnostic.toJson(),
       );
 
-      Helpers.hideLoadingDialog();
-
       if (response.statusCode == 201 || response.statusCode == 200) {
         await loadDiagnostics();
-        Get.back();
+        Get.back(); // Close form
         Helpers.showSuccessSnackbar('Success', 'Test added successfully');
       }
     } on DioException catch (e) {
-      Helpers.hideLoadingDialog();
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to add test',
       );
+    } finally {
+      Helpers.hideLoadingDialog();
     }
   }
 
@@ -65,24 +68,24 @@ class DiagnosticsController extends GetxController {
     try {
       Helpers.showLoadingDialog();
 
-      final response = await _apiService.put(
-        '/diagnostics/$id',
+      // ✅ FIX: Use PATCH method and correct endpoint
+      final response = await _apiService.patch(
+        ApiEndpoints.diagnosticById(id),
         data: diagnostic.toJson(),
       );
 
-      Helpers.hideLoadingDialog();
-
       if (response.statusCode == 200) {
         await loadDiagnostics();
-        Get.back();
+        Get.back(); // Close form
         Helpers.showSuccessSnackbar('Success', 'Test updated successfully');
       }
     } on DioException catch (e) {
-      Helpers.hideLoadingDialog();
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to update test',
       );
+    } finally {
+      Helpers.hideLoadingDialog();
     }
   }
 
@@ -97,16 +100,19 @@ class DiagnosticsController extends GetxController {
 
     try {
       Helpers.showLoadingDialog();
-      await _apiService.delete('/diagnostics/$id');
-      Helpers.hideLoadingDialog();
+
+      await _apiService.delete(ApiEndpoints.diagnosticById(id));
+
       await loadDiagnostics();
+      Get.back();
       Helpers.showSuccessSnackbar('Success', 'Test deleted successfully');
     } on DioException catch (e) {
-      Helpers.hideLoadingDialog();
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to delete test',
       );
+    } finally {
+      Helpers.hideLoadingDialog();
     }
   }
 

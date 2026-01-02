@@ -34,7 +34,7 @@ class DiagnosticModel {
 
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
+      //if (id != null) 'id': id,
       'test_name': testName,
       'category': category,
       'department': department,
