@@ -1,14 +1,17 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
+import 'package:logger/logger.dart';
 import '../config/environment.dart';
 import 'storage_services.dart';
 
 class ApiService extends GetxService {
-  late Dio _dio;
-  final StorageService _storageService = Get.find<StorageService>();
+  late Dio dio;
+  final StorageService storageService = Get.find<StorageService>();
+
+  var logger=Logger();
 
   Future<ApiService> init() async {
-    _dio = Dio(
+    dio = Dio(
       BaseOptions(
         baseUrl: Environment.BASE_URL,
         connectTimeout: const Duration(milliseconds: Environment.CONNECTION_TIMEOUT),
@@ -20,24 +23,24 @@ class ApiService extends GetxService {
       ),
     );
 
-    _dio.interceptors.add(
+    dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = _storageService.getToken();
+          final token = storageService.getToken();
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
           }
-          print('🚀 REQUEST[${options.method}] => PATH: ${options.path}');
+          logger.i('🚀 REQUEST[${options.method}] => PATH: ${options.path}');
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          print('✅ RESPONSE[${response.statusCode}]');
+          logger.i('✅ RESPONSE[${response.statusCode}]');
           return handler.next(response);
         },
         onError: (error, handler) async {
-          print('❌ ERROR[${error.response?.statusCode}]');
+          logger.e('❌ ERROR[${error.response?.statusCode}]');
           if (error.response?.statusCode == 401) {
-            await _storageService.clearAll();
+            await storageService.clearAll();
             Get.offAllNamed('/login');
           }
           return handler.next(error);
@@ -50,22 +53,22 @@ class ApiService extends GetxService {
 
   // GET Request
   Future<Response> get(String endpoint, {Map<String, dynamic>? queryParameters}) async {
-    return await _dio.get(endpoint, queryParameters: queryParameters);
+    return await dio.get(endpoint, queryParameters: queryParameters);
   }
 
   // POST Request
   Future<Response> post(String endpoint, {dynamic data}) async {
-    return await _dio.post(endpoint, data: data);
+    return await dio.post(endpoint, data: data);
   }
 
   // PUT Request
   Future<Response> put(String endpoint, {dynamic data}) async {
-    return await _dio.put(endpoint, data: data);
+    return await dio.put(endpoint, data: data);
   }
 
   // DELETE Request
   Future<Response> delete(String endpoint) async {
-    return await _dio.delete(endpoint);
+    return await dio.delete(endpoint);
   }
 
   // Handle Errors

@@ -9,7 +9,7 @@ import '../../utils/validators.dart';
 import '../../widgets/custom_textfield.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
               borderRadius: BorderRadius.circular(20.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withOpacity(0.4),
                   blurRadius: 30,
                   offset: const Offset(0, 10),
                 ),
@@ -157,12 +157,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   SizedBox(height: 24.h),
 
-                  Text(
-                    'Version 1.0.0',
-                    style: AppTextStyles.caption.copyWith(
-                      color: AppColors.textHint,
-                    ),
-                  ),
                 ],
               ),
             ),

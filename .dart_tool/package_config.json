@@ -146,6 +146,12 @@
       "languageVersion": "3.6"
     },
     {
+      "name": "logger",
+      "rootUri": "file:///Users/jubaer/.pub-cache/hosted/pub.dev/logger-2.6.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
       "name": "matcher",
       "rootUri": "file:///Users/jubaer/.pub-cache/hosted/pub.dev/matcher-0.12.17",
       "packageUri": "lib/",

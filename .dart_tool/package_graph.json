@@ -14,6 +14,7 @@
         "get",
         "get_storage",
         "intl",
+        "logger",
         "shared_preferences"
       ],
       "devDependencies": [
@@ -44,6 +45,13 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "logger",
+      "version": "2.6.2",
+      "dependencies": [
+        "meta"
       ]
     },
     {

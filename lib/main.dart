@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:logger/logger.dart';
 import 'config/theme.dart';
 import 'routes/admin_pages.dart';
 import 'routes/admin_routes.dart';
@@ -21,26 +22,26 @@ void main() async {
   runApp(const MyApp());
 }
 
+var logger = Logger();
+
 Future<void> initServices() async {
-  print('🔧 Starting Services Initialization...');
-
   try {
-    print('📦 Initializing Storage Service...');
+    logger.i('📦 Initializing Storage Service...');
     await Get.putAsync(() => StorageService().init());
-    print('✅ Storage Service Initialized');
+    logger.i('✅ Storage Service Initialized');
 
-    print('🌐 Initializing API Service...');
+    logger.i('🌐 Initializing API Service...');
     await Get.putAsync(() => ApiService().init());
-    print('✅ API Service Initialized');
+    logger.i('✅ API Service Initialized');
 
-    print('🎉 All Services Initialized Successfully!');
+    logger.i('🎉 All Services Initialized Successfully!');
   } catch (e) {
-    print('❌ Error Initializing Services: $e');
+    logger.e('❌ Error Initializing Services: $e');
   }
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +61,7 @@ class MyApp extends StatelessWidget {
           transitionDuration: const Duration(milliseconds: 300),
           builder: (context, widget) {
             return MediaQuery(
-              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+              data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
               child: widget!,
             );
           },

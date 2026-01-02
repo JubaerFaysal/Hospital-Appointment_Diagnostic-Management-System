@@ -9,9 +9,9 @@ class AdminSidebar extends StatelessWidget {
   final String selectedRoute;
 
   const AdminSidebar({
-    Key? key,
+    super.key,
     required this.selectedRoute,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,36 +54,36 @@ class AdminSidebar extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.symmetric(vertical: 16.h),
               children: [
-                _buildMenuItem(
+                menuItem(
                   icon: Icons.dashboard,
                   title: 'Dashboard',
                   route: '/dashboard',
                 ),
-                _buildMenuItem(
+                menuItem(
                   icon: Icons.medical_services,
                   title: 'Doctors',
                   route: '/doctors',
                 ),
-                _buildMenuItem(
+                menuItem(
                   icon: Icons.biotech,
                   title: 'Diagnostics',
                   route: '/diagnostics',
                 ),
-                _buildMenuItem(
+                menuItem(
                   icon: Icons.calendar_today,
                   title: 'Appointments',
                   route: '/appointments',
                 ),
-                _buildMenuItem(
-                  icon: Icons.people,
-                  title: 'Users',
-                  route: '/users',
-                ),
-                _buildMenuItem(
-                  icon: Icons.analytics,
-                  title: 'Analytics',
-                  route: '/analytics',
-                ),
+                // menuItem(
+                //   icon: Icons.people,
+                //   title: 'Users',
+                //   route: '/users',
+                // ),
+                // menuItem(
+                //   icon: Icons.analytics,
+                //   title: 'Analytics',
+                //   route: '/analytics',
+                // ),
               ],
             ),
           ),
@@ -109,7 +109,7 @@ class AdminSidebar extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem({
+  Widget menuItem({
     required IconData icon,
     required String title,
     required String route,

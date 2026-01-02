@@ -8,7 +8,7 @@ import '../../utils/app_text_styles.dart';
 import '../../widgets/admin_sidebar.dart';
 
 class DiagnosticsListScreen extends StatelessWidget {
-  const DiagnosticsListScreen({Key? key}) : super(key: key);
+  const DiagnosticsListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

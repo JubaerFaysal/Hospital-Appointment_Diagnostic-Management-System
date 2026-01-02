@@ -5,8 +5,8 @@ import '../services/storage_services.dart';
 import '../utils/helpers.dart';
 
 class AuthController extends GetxController {
-  final ApiService _apiService = Get.find<ApiService>();
-  final StorageService _storageService = Get.find<StorageService>();
+  final ApiService apiService = Get.find<ApiService>();
+  final StorageService storageService = Get.find<StorageService>();
 
   final isLoading = false.obs;
   final isLoggedIn = false.obs;
@@ -18,7 +18,7 @@ class AuthController extends GetxController {
   }
 
   void checkLoginStatus() {
-    final token = _storageService.getToken();
+    final token = storageService.getToken();
     isLoggedIn.value = token != null;
   }
 
@@ -26,7 +26,7 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
 
-      final response = await _apiService.post(
+      final response = await apiService.post(
         '/admin-auth/login',
         data: {
           'email': email,
@@ -35,8 +35,8 @@ class AuthController extends GetxController {
       );
 
       if (response.data['success'] == true) {
-        await _storageService.saveToken(response.data['token']);
-        await _storageService.saveAdmin(response.data['admin']);
+        await storageService.saveToken(response.data['token']);
+        await storageService.saveAdmin(response.data['admin']);
 
         isLoggedIn.value = true;
 
@@ -64,7 +64,7 @@ class AuthController extends GetxController {
     );
 
     if (confirmed) {
-      await _storageService.clearAll();
+      await storageService.clearAll();
       isLoggedIn.value = false;
       Get.offAllNamed('/login');
     }
