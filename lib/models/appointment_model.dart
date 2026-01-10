@@ -28,8 +28,8 @@ class AppointmentModel {
   factory AppointmentModel.fromJson(Map<String, dynamic> json) {
     return AppointmentModel(
       id: json['id'],
-      doctorId: json['doctorId'] ?? json['doctor_id'],
-      patientId: json['patientId'] ?? json['patient_id'],
+      doctorId: json['doctor']?['id'] ?? json['doctorId'] ?? 0,
+      patientId: json['patient']?['id'] ?? json['patientId'] ?? 0,
       doctorName: json['doctor']?['name'] ?? 'Unknown Doctor',
       doctorSpecialty: json['doctor']?['specialty'] ?? 'General',
       patientName: json['patient']?['name'] ?? 'Unknown Patient',
