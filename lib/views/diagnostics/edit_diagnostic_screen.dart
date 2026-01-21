@@ -37,8 +37,12 @@ class _EditDiagnosticScreenState extends State<EditDiagnosticScreen> {
     _categoryController = TextEditingController(text: diagnostic.category);
     _departmentController = TextEditingController(text: diagnostic.department);
     _priceController = TextEditingController(text: diagnostic.price.toString());
-    _descriptionController = TextEditingController(text: diagnostic.description ?? '');
-    _preparationController = TextEditingController(text: diagnostic.preparation ?? '');
+    _descriptionController = TextEditingController(
+      text: diagnostic.description ?? '',
+    );
+    _preparationController = TextEditingController(
+      text: diagnostic.preparation ?? '',
+    );
   }
 
   @override

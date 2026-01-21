@@ -34,5 +34,4 @@ class Environment {
   // Timeouts
   static const int CONNECTION_TIMEOUT = 30000;
   static const int RECEIVE_TIMEOUT = 30000;
-
 }

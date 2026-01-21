@@ -30,10 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
-      _controller.login(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
+      _controller.login(_emailController.text.trim(), _passwordController.text);
     }
   }
 
@@ -125,38 +122,37 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   SizedBox(height: 40.h),
 
-                  Obx(() => SizedBox(
-                    width: double.infinity,
-                    height: 56.h,
-                    child: ElevatedButton(
-                      onPressed: _controller.isLoading.value
-                          ? null
-                          : _handleLogin,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
+                  Obx(
+                    () => SizedBox(
+                      width: double.infinity,
+                      height: 56.h,
+                      child: ElevatedButton(
+                        onPressed: _controller.isLoading.value
+                            ? null
+                            : _handleLogin,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
                         ),
-                      ),
-                      child: _controller.isLoading.value
-                          ? SizedBox(
-                        height: 24.h,
-                        width: 24.w,
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white),
-                        ),
-                      )
-                          : Text(
-                        'Login',
-                        style: AppTextStyles.button,
+                        child: _controller.isLoading.value
+                            ? SizedBox(
+                                height: 24.h,
+                                width: 24.w,
+                                child: const CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Text('Login', style: AppTextStyles.button),
                       ),
                     ),
-                  )),
+                  ),
 
                   SizedBox(height: 24.h),
-
                 ],
               ),
             ),

@@ -63,29 +63,27 @@ class _CustomTextFieldState extends State<CustomTextField> {
           style: AppTextStyles.body1,
           decoration: InputDecoration(
             hintText: widget.hint ?? widget.label,
-            hintStyle: AppTextStyles.body2.copyWith(
-              color: AppColors.textHint,
-            ),
+            hintStyle: AppTextStyles.body2.copyWith(color: AppColors.textHint),
             prefixIcon: widget.prefixIcon != null
                 ? Icon(
-              widget.prefixIcon,
-              color: AppColors.textSecondary,
-              size: 22.sp,
-            )
+                    widget.prefixIcon,
+                    color: AppColors.textSecondary,
+                    size: 22.sp,
+                  )
                 : null,
             suffixIcon: widget.obscureText
                 ? IconButton(
-              icon: Icon(
-                _obscureText ? Icons.visibility_off : Icons.visibility,
-                color: AppColors.textSecondary,
-                size: 22.sp,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscureText = !_obscureText;
-                });
-              },
-            )
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                      color: AppColors.textSecondary,
+                      size: 22.sp,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  )
                 : null,
           ),
         ),

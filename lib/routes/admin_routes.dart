@@ -4,6 +4,7 @@ class AdminRoutes {
   static const DOCTORS = '/doctors';
   static const DOCTORS_ADD = '/doctors/add';
   static const DOCTORS_EDIT = '/doctors/edit';
+  static const DOCTORS_DETAIL = '/doctors/detail';
   static const DIAGNOSTICS = '/diagnostics';
   static const DIAGNOSTICS_ADD = '/diagnostics/add';
   static const DIAGNOSTICS_EDIT = '/diagnostics/edit';

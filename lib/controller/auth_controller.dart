@@ -28,10 +28,7 @@ class AuthController extends GetxController {
 
       final response = await apiService.post(
         '/admin-auth/login',
-        data: {
-          'email': email,
-          'password': password,
-        },
+        data: {'email': email, 'password': password},
       );
 
       Helpers.hideLoadingDialog();

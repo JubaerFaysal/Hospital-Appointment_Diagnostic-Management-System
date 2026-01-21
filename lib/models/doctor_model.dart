@@ -19,11 +19,7 @@ class DaySchedule {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'day': day,
-      'startTime': startTime,
-      'endTime': endTime,
-    };
+    return {'day': day, 'startTime': startTime, 'endTime': endTime};
   }
 }
 
@@ -45,6 +41,10 @@ class DoctorModel {
   final int? availableSlots;
   final List<DaySchedule>? workingDays;
   final int? consultLimitPerDay;
+  final String status; // 'active', 'inactive', 'suspended'
+  final String? suspensionReason;
+  final DateTime? suspendedAt;
+  final int? appointmentsCount;
 
   DoctorModel({
     this.id,
@@ -64,6 +64,10 @@ class DoctorModel {
     this.availableSlots,
     this.workingDays,
     this.consultLimitPerDay,
+    this.status = 'active',
+    this.suspensionReason,
+    this.suspendedAt,
+    this.appointmentsCount,
   });
 
   factory DoctorModel.fromJson(Map<String, dynamic> json) {
@@ -89,10 +93,16 @@ class DoctorModel {
       availableSlots: json['available_slots'],
       workingDays: json['workingDays'] != null
           ? (json['workingDays'] as List)
-              .map((item) => DaySchedule.fromJson(item))
-              .toList()
+                .map((item) => DaySchedule.fromJson(item))
+                .toList()
           : null,
       consultLimitPerDay: json['consultLimitPerDay'] ?? 30,
+      status: json['status'] ?? 'active',
+      suspensionReason: json['suspensionReason'],
+      suspendedAt: json['suspendedAt'] != null
+          ? DateTime.parse(json['suspendedAt'])
+          : null,
+      appointmentsCount: json['appointmentsCount'],
     );
   }
 
@@ -114,6 +124,9 @@ class DoctorModel {
       'available_slots': availableSlots,
       'workingDays': workingDays?.map((d) => d.toJson()).toList(),
       'consultLimitPerDay': consultLimitPerDay ?? 30,
+      'status': status,
+      if (suspensionReason != null) 'suspensionReason': suspensionReason,
+      if (suspendedAt != null) 'suspendedAt': suspendedAt!.toIso8601String(),
     };
   }
 }

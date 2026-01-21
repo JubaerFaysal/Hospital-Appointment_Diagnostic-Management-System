@@ -9,6 +9,7 @@ import '../views/diagnostics/add_diagnostic_screen.dart';
 import '../views/diagnostics/diagnostic_list_screen.dart';
 import '../views/diagnostics/edit_diagnostic_screen.dart';
 import '../views/doctors/add_doctor_screen.dart';
+import '../views/doctors/doctor_detail_screen.dart';
 import '../views/doctors/doctors_list_screen.dart';
 import '../views/doctors/edit_doctor_screen.dart';
 import '../views/users/users_list_screen.dart';
@@ -23,6 +24,10 @@ class AdminPages {
     GetPage(
       name: AdminRoutes.DOCTORS_EDIT,
       page: () => const EditDoctorScreen(),
+    ),
+    GetPage(
+      name: AdminRoutes.DOCTORS_DETAIL,
+      page: () => const DoctorDetailScreen(),
     ),
     GetPage(
       name: AdminRoutes.DIAGNOSTICS,

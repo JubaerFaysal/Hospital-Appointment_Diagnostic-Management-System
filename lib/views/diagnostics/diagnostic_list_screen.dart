@@ -139,9 +139,13 @@ class DiagnosticsListScreen extends StatelessWidget {
         child: DataTable(
           columns: [
             DataColumn(label: Text('ID', style: AppTextStyles.subtitle1)),
-            DataColumn(label: Text('Test Name', style: AppTextStyles.subtitle1)),
+            DataColumn(
+              label: Text('Test Name', style: AppTextStyles.subtitle1),
+            ),
             DataColumn(label: Text('Category', style: AppTextStyles.subtitle1)),
-            DataColumn(label: Text('Department', style: AppTextStyles.subtitle1)),
+            DataColumn(
+              label: Text('Department', style: AppTextStyles.subtitle1),
+            ),
             DataColumn(label: Text('Price', style: AppTextStyles.subtitle1)),
             DataColumn(label: Text('Actions', style: AppTextStyles.subtitle1)),
           ],
@@ -152,10 +156,7 @@ class DiagnosticsListScreen extends StatelessWidget {
                 DataCell(
                   SizedBox(
                     width: 200.w,
-                    child: Text(
-                      test.testName,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    child: Text(test.testName, overflow: TextOverflow.ellipsis),
                   ),
                 ),
                 DataCell(Text(test.category)),
@@ -167,10 +168,8 @@ class DiagnosticsListScreen extends StatelessWidget {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.edit, color: AppColors.info),
-                        onPressed: () => Get.toNamed(
-                          '/diagnostics/edit',
-                          arguments: test,
-                        ),
+                        onPressed: () =>
+                            Get.toNamed('/diagnostics/edit', arguments: test),
                         tooltip: 'Edit',
                       ),
                       IconButton(

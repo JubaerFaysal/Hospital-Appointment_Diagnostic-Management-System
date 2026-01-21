@@ -55,7 +55,9 @@ class DiagnosticBookingsController extends GetxController {
       filteredBookings.value = bookings;
     } else {
       filteredBookings.value = bookings
-          .where((booking) => booking.status.toLowerCase() == status.toLowerCase())
+          .where(
+            (booking) => booking.status.toLowerCase() == status.toLowerCase(),
+          )
           .toList();
     }
   }
@@ -65,8 +67,12 @@ class DiagnosticBookingsController extends GetxController {
       filterByStatus(selectedStatus.value);
     } else {
       filteredBookings.value = bookings.where((booking) {
-        return booking.patientName.toLowerCase().contains(query.toLowerCase()) ||
-            booking.diagnosticName.toLowerCase().contains(query.toLowerCase()) ||
+        return booking.patientName.toLowerCase().contains(
+              query.toLowerCase(),
+            ) ||
+            booking.diagnosticName.toLowerCase().contains(
+              query.toLowerCase(),
+            ) ||
             booking.patientPhone.contains(query);
       }).toList();
     }
@@ -75,14 +81,41 @@ class DiagnosticBookingsController extends GetxController {
   Future<void> updateBookingStatus(int id, String newStatus) async {
     final confirmed = await Helpers.showConfirmDialog(
       title: 'Update Status',
-      message: 'Are you sure you want to change status to ${newStatus.toUpperCase()}?',
+      message:
+          'Are you sure you want to change status to ${newStatus.toUpperCase()}?',
       confirmText: 'Update',
     );
 
     if (!confirmed) return;
 
     try {
-      Helpers.showLoadingDialog();
+      // Update locally first for instant UI update
+      final bookingIndex = bookings.indexWhere((b) => b.id == id);
+      if (bookingIndex != -1) {
+        final updatedBooking = DiagnosticBookingModel(
+          id: bookings[bookingIndex].id,
+          diagnosticId: bookings[bookingIndex].diagnosticId,
+          diagnosticName: bookings[bookingIndex].diagnosticName,
+          diagnosticCategory: bookings[bookingIndex].diagnosticCategory,
+          patientId: bookings[bookingIndex].patientId,
+          patientName: bookings[bookingIndex].patientName,
+          patientPhone: bookings[bookingIndex].patientPhone,
+          scheduleDate: bookings[bookingIndex].scheduleDate,
+          status: newStatus,
+          notes: bookings[bookingIndex].notes,
+          paymentMethod: bookings[bookingIndex].paymentMethod,
+          paymentStatus: bookings[bookingIndex].paymentStatus,
+          isPaid: bookings[bookingIndex].isPaid,
+          transactionId: bookings[bookingIndex].transactionId,
+          bankTransactionId: bookings[bookingIndex].bankTransactionId,
+          paidAmount: bookings[bookingIndex].paidAmount,
+          createdAt: bookings[bookingIndex].createdAt,
+          updatedAt: DateTime.now(),
+          cancellationReason: bookings[bookingIndex].cancellationReason,
+        );
+        bookings[bookingIndex] = updatedBooking;
+        filterByStatus(selectedStatus.value);
+      }
 
       final response = await _apiService.patch(
         ApiEndpoints.diagnosticBookingById(id),
@@ -90,23 +123,24 @@ class DiagnosticBookingsController extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        await loadBookings();
         Helpers.showSuccessSnackbar('Success', 'Booking status updated');
       }
     } on DioException catch (e) {
+      // Revert on error
+      await loadBookings();
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to update status',
       );
-    } finally {
-      Helpers.hideLoadingDialog();
+    } catch (e) {
+      // Revert on unexpected error
+      await loadBookings();
+      Helpers.showErrorSnackbar('Error', 'An unexpected error occurred');
     }
   }
 
   Future<void> cancelBooking(int id, String reason) async {
     try {
-      Helpers.showLoadingDialog();
-
       final response = await _apiService.post(
         ApiEndpoints.diagnosticBookingCancel(id),
         data: {'reason': reason},
@@ -115,15 +149,18 @@ class DiagnosticBookingsController extends GetxController {
       if (response.statusCode == 200) {
         await loadBookings();
         Get.back(); // Close dialog
-        Helpers.showSuccessSnackbar('Success', 'Booking cancelled successfully');
+        Helpers.showSuccessSnackbar(
+          'Success',
+          'Booking cancelled successfully',
+        );
       }
     } on DioException catch (e) {
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to cancel booking',
       );
-    } finally {
-      Helpers.hideLoadingDialog();
+    } catch (e) {
+      Helpers.showErrorSnackbar('Error', 'An unexpected error occurred');
     }
   }
 
@@ -137,8 +174,6 @@ class DiagnosticBookingsController extends GetxController {
     if (!confirmed) return;
 
     try {
-      Helpers.showLoadingDialog();
-
       await _apiService.delete(ApiEndpoints.diagnosticBookingById(id));
 
       await loadBookings();
@@ -148,8 +183,8 @@ class DiagnosticBookingsController extends GetxController {
         'Error',
         e.response?.data['message'] ?? 'Failed to delete booking',
       );
-    } finally {
-      Helpers.hideLoadingDialog();
+    } catch (e) {
+      Helpers.showErrorSnackbar('Error', 'An unexpected error occurred');
     }
   }
 
@@ -163,14 +198,9 @@ class DiagnosticBookingsController extends GetxController {
     if (!confirmed) return;
 
     try {
-      Helpers.showLoadingDialog();
-
       final response = await _apiService.post(
         ApiEndpoints.DIAGNOSTIC_BOOKINGS_BULK_STATUS,
-        data: {
-          'ids': ids,
-          'status': status,
-        },
+        data: {'ids': ids, 'status': status},
       );
 
       if (response.statusCode == 200) {
@@ -185,15 +215,18 @@ class DiagnosticBookingsController extends GetxController {
         'Error',
         e.response?.data['message'] ?? 'Failed to bulk update',
       );
-    } finally {
-      Helpers.hideLoadingDialog();
+    } catch (e) {
+      Helpers.showErrorSnackbar('Error', 'An unexpected error occurred');
     }
   }
 
   // Get statistics
   int get totalBookings => bookings.length;
   int get pendingCount => bookings.where((b) => b.status == 'pending').length;
-  int get confirmedCount => bookings.where((b) => b.status == 'confirmed').length;
-  int get completedCount => bookings.where((b) => b.status == 'completed').length;
-  int get cancelledCount => bookings.where((b) => b.status == 'cancelled').length;
+  int get confirmedCount =>
+      bookings.where((b) => b.status == 'confirmed').length;
+  int get completedCount =>
+      bookings.where((b) => b.status == 'completed').length;
+  int get cancelledCount =>
+      bookings.where((b) => b.status == 'cancelled').length;
 }

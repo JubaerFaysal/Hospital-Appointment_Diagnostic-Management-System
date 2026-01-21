@@ -10,7 +10,6 @@ import '../../utils/app_text_styles.dart';
 import '../../widgets/admin_sidebar.dart';
 import '../../widgets/custom_textfield.dart';
 
-
 class UsersListScreen extends StatelessWidget {
   const UsersListScreen({Key? key}) : super(key: key);
 
@@ -45,10 +44,7 @@ class UsersListScreen extends StatelessWidget {
                                 color: AppColors.textHint,
                               ),
                               SizedBox(height: 16.h),
-                              Text(
-                                'No users found',
-                                style: AppTextStyles.h4,
-                              ),
+                              Text('No users found', style: AppTextStyles.h4),
                             ],
                           ),
                         );
@@ -141,7 +137,9 @@ class UsersListScreen extends StatelessWidget {
             DataColumn(label: Text('Phone', style: AppTextStyles.subtitle1)),
             DataColumn(label: Text('Age', style: AppTextStyles.subtitle1)),
             DataColumn(label: Text('Gender', style: AppTextStyles.subtitle1)),
-            DataColumn(label: Text('Registered', style: AppTextStyles.subtitle1)),
+            DataColumn(
+              label: Text('Registered', style: AppTextStyles.subtitle1),
+            ),
             DataColumn(label: Text('Actions', style: AppTextStyles.subtitle1)),
           ],
           rows: controller.filteredUsers.map((user) {
@@ -168,7 +166,10 @@ class UsersListScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.visibility, color: AppColors.info),
+                        icon: const Icon(
+                          Icons.visibility,
+                          color: AppColors.info,
+                        ),
                         onPressed: () => _showUserDetails(user),
                         tooltip: 'View',
                       ),
@@ -238,7 +239,9 @@ class UsersListScreen extends StatelessWidget {
   void _showEditUserDialog(UsersController controller, user) {
     final nameController = TextEditingController(text: user.name);
     final phoneController = TextEditingController(text: user.phone);
-    final ageController = TextEditingController(text: user.age?.toString() ?? '');
+    final ageController = TextEditingController(
+      text: user.age?.toString() ?? '',
+    );
 
     Get.dialog(
       Dialog(
@@ -254,20 +257,12 @@ class UsersListScreen extends StatelessWidget {
             children: [
               Text(
                 'Edit User',
-                style: AppTextStyles.h4.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTextStyles.h4.copyWith(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 24.h),
-              CustomTextField(
-                controller: nameController,
-                label: 'Name',
-              ),
+              CustomTextField(controller: nameController, label: 'Name'),
               SizedBox(height: 16.h),
-              CustomTextField(
-                controller: phoneController,
-                label: 'Phone',
-              ),
+              CustomTextField(controller: phoneController, label: 'Phone'),
               SizedBox(height: 16.h),
               CustomTextField(
                 controller: ageController,
@@ -329,9 +324,7 @@ class UsersListScreen extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: AppTextStyles.body2.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: AppTextStyles.body2.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
         ],

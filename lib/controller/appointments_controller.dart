@@ -23,7 +23,6 @@ class AppointmentsController extends GetxController {
     'pending',
     'confirmed',
     'completed',
-    'rejected',
     'cancelled',
   ];
 
@@ -100,38 +99,84 @@ class AppointmentsController extends GetxController {
   }
 
   Future<void> updateAppointmentStatus(int id, String newStatus) async {
-    if (!['pending', 'confirmed', 'completed', 'rejected', 'cancelled'].contains(newStatus)) {
+    if (![
+      'pending',
+      'confirmed',
+      'completed',
+      'cancelled',
+    ].contains(newStatus)) {
       Helpers.showErrorSnackbar('Error', 'Invalid status: $newStatus');
       return;
     }
 
     final confirmed = await Helpers.showConfirmDialog(
       title: 'Update Status',
-      message: 'Are you sure you want to change status to ${newStatus.toUpperCase()}?',
+      message:
+          'Are you sure you want to change status to ${newStatus.toUpperCase()}?',
       confirmText: 'Update',
     );
 
     if (!confirmed) return;
 
     try {
-      Helpers.showLoadingDialog();
+      logger.i('📝 Updating appointment $id status to $newStatus');
 
-      final response = await _apiService.patch(
-        ApiEndpoints.appointmentById(id),
-        data: {'status': newStatus},
+      final response = await _apiService.post(
+        ApiEndpoints.APPOINTMENTS_BULK_STATUS,
+        data: {
+          'ids': [id],
+          'status': newStatus,
+        },
       );
 
+      logger.i('✅ Status update response: ${response.statusCode}');
+
       if (response.statusCode == 200) {
-        await loadAppointments();
-        Helpers.showSuccessSnackbar('Success', 'Appointment status updated to $newStatus');
+        // Update the appointment status in the local list immediately
+        final index = appointments.indexWhere((apt) => apt.id == id);
+        if (index != -1) {
+          final updatedAppointment = AppointmentModel(
+            id: appointments[index].id,
+            doctorId: appointments[index].doctorId,
+            patientId: appointments[index].patientId,
+            doctorName: appointments[index].doctorName,
+            doctorSpecialty: appointments[index].doctorSpecialty,
+            patientName: appointments[index].patientName,
+            patientPhone: appointments[index].patientPhone,
+            date: appointments[index].date,
+            status: newStatus,
+            serialNumber: appointments[index].serialNumber,
+            fee: appointments[index].fee,
+            cancellationReason: appointments[index].cancellationReason,
+          );
+
+          appointments[index] = updatedAppointment;
+          appointments.refresh();
+
+          // Update filtered list
+          final filteredIndex = filteredAppointments.indexWhere(
+            (apt) => apt.id == id,
+          );
+          if (filteredIndex != -1) {
+            filteredAppointments[filteredIndex] = updatedAppointment;
+            filteredAppointments.refresh();
+          }
+        }
+
+        Helpers.showSuccessSnackbar(
+          'Success',
+          'Appointment status updated to $newStatus',
+        );
       }
     } on DioException catch (e) {
+      logger.e('❌ Status update error: ${e.response?.data}');
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to update status',
       );
-    } finally {
-      Helpers.hideLoadingDialog();
+    } catch (e) {
+      logger.e('❌ Unexpected error: $e');
+      Helpers.showErrorSnackbar('Error', 'An unexpected error occurred');
     }
   }
 
@@ -141,7 +186,7 @@ class AppointmentsController extends GetxController {
 
       final response = await _apiService.post(
         ApiEndpoints.appointmentCancel(id),
-        data: {'reason': reason},
+        data: {'cancellationReason': reason},
       );
 
       if (response.statusCode == 200) {
@@ -173,7 +218,10 @@ class AppointmentsController extends GetxController {
       await _apiService.delete(ApiEndpoints.appointmentById(id));
 
       await loadAppointments();
-      Helpers.showSuccessSnackbar('Success', 'Appointment deleted successfully');
+      Helpers.showSuccessSnackbar(
+        'Success',
+        'Appointment deleted successfully',
+      );
     } on DioException catch (e) {
       Helpers.showErrorSnackbar(
         'Error',
@@ -184,10 +232,39 @@ class AppointmentsController extends GetxController {
     }
   }
 
+  Future<void> reassignAppointment(int appointmentId, int newDoctorId) async {
+    try {
+      Helpers.showLoadingDialog();
+
+      final response = await _apiService.patch(
+        ApiEndpoints.appointmentReassign(appointmentId),
+        data: {'newDoctorId': newDoctorId},
+      );
+
+      if (response.statusCode == 200) {
+        await loadAppointments();
+        Helpers.showSuccessSnackbar(
+          'Success',
+          'Appointment reassigned successfully',
+        );
+      }
+    } on DioException catch (e) {
+      Helpers.showErrorSnackbar(
+        'Error',
+        e.response?.data['message'] ?? 'Failed to reassign appointment',
+      );
+    } finally {
+      Helpers.hideLoadingDialog();
+    }
+  }
+
   int get totalAppointments => appointments.length;
-  int get pendingCount => appointments.where((a) => a.status == 'pending').length;
-  int get confirmedCount => appointments.where((a) => a.status == 'confirmed').length;
-  int get completedCount => appointments.where((a) => a.status == 'completed').length;
-  int get rejectedCount => appointments.where((a) => a.status == 'rejected').length;
-  int get cancelledCount => appointments.where((a) => a.status == 'cancelled').length;
+  int get pendingCount =>
+      appointments.where((a) => a.status == 'pending').length;
+  int get confirmedCount =>
+      appointments.where((a) => a.status == 'confirmed').length;
+  int get completedCount =>
+      appointments.where((a) => a.status == 'completed').length;
+  int get cancelledCount =>
+      appointments.where((a) => a.status == 'cancelled').length;
 }

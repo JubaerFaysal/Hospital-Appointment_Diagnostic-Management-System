@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
 import '../controller/auth_controller.dart';
 import '../utils/app_colors.dart';
-import '../utils/app_text_styles.dart';
 
 class AdminSidebar extends StatelessWidget {
   final String selectedRoute;
@@ -15,87 +15,204 @@ class AdminSidebar extends StatelessWidget {
     final authController = Get.find<AuthController>();
 
     return Container(
-      width: 260.w,
-      color: AppColors.primaryDark,
+      width: 270.w,
+      decoration: BoxDecoration(
+        color: AppColors.sidebarBg,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(2, 0),
+          ),
+        ],
+      ),
       child: Column(
         children: [
-          // Logo
+          // Logo Section
           Container(
-            height: 70.h,
-            padding: EdgeInsets.all(16.w),
+            height: 80.h,
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary.withOpacity(0.2),
+                  Colors.transparent,
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
             child: Row(
               children: [
-                Icon(Icons.local_hospital, color: Colors.white, size: 32.sp),
-                SizedBox(width: 12.w),
+                Container(
+                  padding: EdgeInsets.all(10.w),
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.local_hospital_rounded,
+                    color: Colors.white,
+                    size: 24.sp,
+                  ),
+                ),
+                SizedBox(width: 14.w),
                 Expanded(
-                  child: Text(
-                    'Admin Panel',
-                    style: AppTextStyles.h4.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hospital Admin',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      Text(
+                        'Admin Dashboard',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
 
-          Divider(color: Colors.white.withOpacity(0.2), height: 1),
+          SizedBox(height: 8.h),
+
+          // Menu Section Label
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'MAIN MENU',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.4),
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+          ),
 
           // Menu Items
           Expanded(
             child: ListView(
-              padding: EdgeInsets.symmetric(vertical: 16.h),
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
               children: [
-                menuItem(
-                  icon: Icons.dashboard,
+                _menuItem(
+                  icon: Icons.dashboard_rounded,
                   title: 'Dashboard',
                   route: '/dashboard',
                 ),
-                menuItem(
-                  icon: Icons.medical_services,
+                _menuItem(
+                  icon: Icons.medical_services_rounded,
                   title: 'Doctors',
                   route: '/doctors',
                 ),
-                menuItem(
-                  icon: Icons.biotech,
+                _menuItem(
+                  icon: Icons.biotech_rounded,
                   title: 'Diagnostics',
                   route: '/diagnostics',
                 ),
-                menuItem(
-                  icon: Icons.assignment,
+                _menuItem(
+                  icon: Icons.science_rounded,
                   title: 'Diagnostic Bookings',
                   route: '/diagnostic-bookings',
                 ),
-                menuItem(
-                  icon: Icons.calendar_today,
+                _menuItem(
+                  icon: Icons.calendar_month_rounded,
                   title: 'Appointments',
                   route: '/appointments',
                 ),
-                menuItem(icon: Icons.people, title: 'Users', route: '/users'),
-                // menuItem(
-                //   icon: Icons.analytics,
-                //   title: 'Analytics',
-                //   route: '/analytics',
-                // ),
+                _menuItem(
+                  icon: Icons.people_alt_rounded,
+                  title: 'Users',
+                  route: '/users',
+                ),
               ],
             ),
           ),
 
-          // Logout
-          Padding(
+          // Bottom Section
+          Container(
             padding: EdgeInsets.all(16.w),
-            child: ListTile(
-              leading: const Icon(Icons.logout, color: Colors.white),
-              title: Text(
-                'Logout',
-                style: AppTextStyles.body1.copyWith(color: Colors.white),
-              ),
-              onTap: () => authController.logout(),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              hoverColor: Colors.white.withOpacity(0.1),
+            margin: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 40.w,
+                  height: 40.w,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'A',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.sp,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Admin User',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        'Administrator',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 11.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => authController.logout(),
+                  icon: Icon(
+                    Icons.logout_rounded,
+                    color: Colors.white.withOpacity(0.7),
+                    size: 20.sp,
+                  ),
+                  tooltip: 'Logout',
+                ),
+              ],
             ),
           ),
         ],
@@ -103,7 +220,7 @@ class AdminSidebar extends StatelessWidget {
     );
   }
 
-  Widget menuItem({
+  Widget _menuItem({
     required IconData icon,
     required String title,
     required String route,
@@ -111,21 +228,66 @@ class AdminSidebar extends StatelessWidget {
     final isSelected = selectedRoute == route;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.white, size: 22.sp),
-        title: Text(
-          title,
-          style: AppTextStyles.body1.copyWith(
-            color: Colors.white,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+      padding: EdgeInsets.symmetric(vertical: 2.h),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => Get.toNamed(route),
+          borderRadius: BorderRadius.circular(10.r),
+          hoverColor: AppColors.sidebarHover,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.r),
+              color: isSelected ? AppColors.primary : Colors.transparent,
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: isSelected
+                      ? Colors.white
+                      : Colors.white.withOpacity(0.6),
+                  size: 20.sp,
+                ),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: isSelected
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.8),
+                      fontSize: 13.sp,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                    ),
+                  ),
+                ),
+                if (isSelected)
+                  Container(
+                    width: 6.w,
+                    height: 6.w,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
-        selected: isSelected,
-        selectedTileColor: Colors.white.withOpacity(0.15),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-        onTap: () => Get.toNamed(route),
-        hoverColor: Colors.white.withOpacity(0.1),
       ),
     );
   }

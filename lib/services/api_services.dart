@@ -14,8 +14,12 @@ class ApiService extends GetxService {
     dio = Dio(
       BaseOptions(
         baseUrl: Environment.BASE_URL,
-        connectTimeout: const Duration(milliseconds: Environment.CONNECTION_TIMEOUT),
-        receiveTimeout: const Duration(milliseconds: Environment.RECEIVE_TIMEOUT),
+        connectTimeout: const Duration(
+          milliseconds: Environment.CONNECTION_TIMEOUT,
+        ),
+        receiveTimeout: const Duration(
+          milliseconds: Environment.RECEIVE_TIMEOUT,
+        ),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -37,16 +41,22 @@ class ApiService extends GetxService {
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          logger.i('✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
+          logger.i(
+            '✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
+          );
           return handler.next(response);
         },
         onError: (error, handler) async {
-          logger.e('❌ ERROR[${error.response?.statusCode}] => PATH: ${error.requestOptions.path}');
+          logger.e(
+            '❌ ERROR[${error.response?.statusCode}] => PATH: ${error.requestOptions.path}',
+          );
           logger.e('Error message: ${error.message}');
 
           // ✅ Handle 401 Unauthorized (token expired or invalid)
           if (error.response?.statusCode == 401) {
-            logger.w('⚠️ Unauthorized! Clearing storage and redirecting to login...');
+            logger.w(
+              '⚠️ Unauthorized! Clearing storage and redirecting to login...',
+            );
             await storageService.clearAll();
             Get.offAllNamed('/login');
           }
@@ -60,7 +70,10 @@ class ApiService extends GetxService {
   }
 
   // GET Request
-  Future<Response> get(String endpoint, {Map<String, dynamic>? queryParameters}) async {
+  Future<Response> get(
+    String endpoint, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
     return await dio.get(endpoint, queryParameters: queryParameters);
   }
 

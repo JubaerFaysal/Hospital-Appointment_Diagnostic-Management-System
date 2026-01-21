@@ -7,10 +7,9 @@ class AppointmentModel {
   final String patientName;
   final String patientPhone;
   final String date;
-  final String timeSlot;
   final String status;
+  final int? serialNumber;
   final double? fee;
-  final String? rejectionReason;
   final String? cancellationReason;
 
   AppointmentModel({
@@ -22,10 +21,9 @@ class AppointmentModel {
     required this.patientName,
     required this.patientPhone,
     required this.date,
-    required this.timeSlot,
     required this.status,
+    this.serialNumber,
     this.fee,
-    this.rejectionReason,
     this.cancellationReason,
   });
 
@@ -39,10 +37,9 @@ class AppointmentModel {
       patientName: json['patient']?['name'] ?? 'Unknown Patient',
       patientPhone: json['patient']?['phone'] ?? 'N/A',
       date: json['date'] ?? '',
-      timeSlot: json['time_slot'] ?? json['timeSlot'] ?? '',
       status: json['status'] ?? 'pending',
+      serialNumber: json['serialNumber'],
       fee: json['doctor']?['fee']?.toDouble(),
-      rejectionReason: json['rejectionReason'],
       cancellationReason: json['cancellationReason'],
     );
   }
@@ -53,7 +50,6 @@ class AppointmentModel {
       'doctorId': doctorId,
       'patientId': patientId,
       'date': date,
-      'time_slot': timeSlot,
       'status': status,
     };
   }
@@ -63,5 +59,4 @@ class AppointmentModel {
   bool get isConfirmed => status == 'confirmed';
   bool get isCompleted => status == 'completed';
   bool get isCancelled => status == 'cancelled';
-  bool get isRejected => status == 'rejected';
 }

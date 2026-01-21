@@ -9,6 +9,12 @@ class DiagnosticBookingModel {
   final String scheduleDate;
   final String status;
   final String? notes;
+  final String? paymentMethod;
+  final String? paymentStatus;
+  final String? isPaid;
+  final String? transactionId;
+  final String? bankTransactionId;
+  final String? paidAmount;
   final String? cancellationReason;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -24,6 +30,12 @@ class DiagnosticBookingModel {
     required this.scheduleDate,
     required this.status,
     this.notes,
+    this.paymentMethod,
+    this.paymentStatus,
+    this.isPaid,
+    this.transactionId,
+    this.bankTransactionId,
+    this.paidAmount,
     this.cancellationReason,
     required this.createdAt,
     this.updatedAt,
@@ -37,10 +49,16 @@ class DiagnosticBookingModel {
       diagnosticName: json['diagnostic']?['test_name'] ?? 'Unknown Test',
       diagnosticCategory: json['diagnostic']?['category'] ?? 'General',
       patientName: json['patient']?['name'] ?? 'Unknown Patient',
-      patientPhone: json['patient']?['phone'] ?? 'N/A',
+      patientPhone: json['patient']?['phone'] ?? '',
       scheduleDate: json['scheduleDate'] ?? '',
       status: json['status'] ?? 'pending',
       notes: json['notes'],
+      paymentMethod: json['paymentMethod'],
+      paymentStatus: json['paymentStatus'],
+      isPaid: json['isPaid'],
+      transactionId: json['transactionId'],
+      bankTransactionId: json['bankTransactionId'],
+      paidAmount: json['paidAmount'],
       cancellationReason: json['cancellationReason'],
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
