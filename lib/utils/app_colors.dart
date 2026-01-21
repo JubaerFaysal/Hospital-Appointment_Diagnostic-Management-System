@@ -29,11 +29,15 @@ class AppColors {
   static const Color info = Color(0xFF2196F3);
 
   // Appointment Status Colors
-  static const Color pending = Color(0xFFFF9800);
+  static const Color pending = Color(0xFFFF9800);      // Orange
+  static const Color confirmed = Color(0xFF4CAF50);    // ✅ Green (changed from 'approved')
+  static const Color rejected = Color(0xFFF44336);     // Red
+  static const Color completed = Color(0xFF2196F3);    // Blue
+  static const Color cancelled = Color(0xFF757575);    // Grey
+
+  // ✅ Deprecated - kept for backward compatibility
+  @Deprecated('Use confirmed instead')
   static const Color approved = Color(0xFF4CAF50);
-  static const Color rejected = Color(0xFFF44336);
-  static const Color completed = Color(0xFF2196F3);
-  static const Color cancelled = Color(0xFF757575);
 
   // Border Colors
   static const Color border = Color(0xFFE0E0E0);

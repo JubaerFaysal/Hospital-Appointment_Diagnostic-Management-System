@@ -15,8 +15,17 @@ class AppointmentsController extends GetxController {
   final filteredAppointments = <AppointmentModel>[].obs;
   final selectedStatus = 'all'.obs;
   final currentPage = 1.obs;
-  final pageLimit = 100.obs; // Increased limit to get all appointments
+  final pageLimit = 100.obs;
   final totalAppointmentsCount = 0.obs;
+
+  final List<String> statusFilters = [
+    'all',
+    'pending',
+    'confirmed',
+    'completed',
+    'rejected',
+    'cancelled',
+  ];
 
   @override
   void onInit() {
@@ -28,7 +37,6 @@ class AppointmentsController extends GetxController {
     try {
       isLoading.value = true;
 
-      // ✅ FIX: Include pagination and status query parameters
       final queryParams = {
         'page': currentPage.value,
         'limit': pageLimit.value,
@@ -46,12 +54,11 @@ class AppointmentsController extends GetxController {
       logger.i('📊 API Response Data: ${response.data}');
 
       if (response.data != null) {
-        // ✅ Check if response has pagination structure
         final data = response.data is Map && response.data.containsKey('data')
             ? response.data['data']
             : response.data;
 
-        logger.i('🔍 Extracted data: $data');
+        logger.i('📁 Extracted data: $data');
 
         appointments.value = (data as List)
             .map((json) => AppointmentModel.fromJson(json))
@@ -59,15 +66,11 @@ class AppointmentsController extends GetxController {
 
         logger.i('✨ Parsed ${appointments.length} appointments');
 
-        // Update total count if available
         if (response.data is Map && response.data.containsKey('total')) {
           totalAppointmentsCount.value = response.data['total'];
         }
 
-        // Sort by date (newest first)
         appointments.sort((a, b) => b.date.compareTo(a.date));
-
-        // Update filtered appointments with the loaded data
         filteredAppointments.value = appointments;
       }
     } catch (e) {
@@ -80,8 +83,8 @@ class AppointmentsController extends GetxController {
 
   void filterByStatus(String status) {
     selectedStatus.value = status;
-    currentPage.value = 1; // Reset to first page when changing filter
-    loadAppointments(); // Reload data with new status filter
+    currentPage.value = 1;
+    loadAppointments();
   }
 
   void searchAppointments(String query) {
@@ -97,10 +100,14 @@ class AppointmentsController extends GetxController {
   }
 
   Future<void> updateAppointmentStatus(int id, String newStatus) async {
+    if (!['pending', 'confirmed', 'completed', 'rejected', 'cancelled'].contains(newStatus)) {
+      Helpers.showErrorSnackbar('Error', 'Invalid status: $newStatus');
+      return;
+    }
+
     final confirmed = await Helpers.showConfirmDialog(
       title: 'Update Status',
-      message:
-          'Are you sure you want to change status to ${newStatus.toUpperCase()}?',
+      message: 'Are you sure you want to change status to ${newStatus.toUpperCase()}?',
       confirmText: 'Update',
     );
 
@@ -109,7 +116,6 @@ class AppointmentsController extends GetxController {
     try {
       Helpers.showLoadingDialog();
 
-      // ✅ FIX: Use PATCH method and correct endpoint
       final response = await _apiService.patch(
         ApiEndpoints.appointmentById(id),
         data: {'status': newStatus},
@@ -117,12 +123,35 @@ class AppointmentsController extends GetxController {
 
       if (response.statusCode == 200) {
         await loadAppointments();
-        Helpers.showSuccessSnackbar('Success', 'Appointment status updated');
+        Helpers.showSuccessSnackbar('Success', 'Appointment status updated to $newStatus');
       }
     } on DioException catch (e) {
       Helpers.showErrorSnackbar(
         'Error',
         e.response?.data['message'] ?? 'Failed to update status',
+      );
+    } finally {
+      Helpers.hideLoadingDialog();
+    }
+  }
+
+  Future<void> cancelAppointment(int id, String reason) async {
+    try {
+      Helpers.showLoadingDialog();
+
+      final response = await _apiService.post(
+        ApiEndpoints.appointmentCancel(id),
+        data: {'reason': reason},
+      );
+
+      if (response.statusCode == 200) {
+        await loadAppointments();
+        Helpers.showSuccessSnackbar('Success', 'Appointment cancelled');
+      }
+    } on DioException catch (e) {
+      Helpers.showErrorSnackbar(
+        'Error',
+        e.response?.data['message'] ?? 'Failed to cancel appointment',
       );
     } finally {
       Helpers.hideLoadingDialog();
@@ -141,14 +170,10 @@ class AppointmentsController extends GetxController {
     try {
       Helpers.showLoadingDialog();
 
-      // ✅ FIX: Use correct endpoint
       await _apiService.delete(ApiEndpoints.appointmentById(id));
 
       await loadAppointments();
-      Helpers.showSuccessSnackbar(
-        'Success',
-        'Appointment deleted successfully',
-      );
+      Helpers.showSuccessSnackbar('Success', 'Appointment deleted successfully');
     } on DioException catch (e) {
       Helpers.showErrorSnackbar(
         'Error',
@@ -159,14 +184,10 @@ class AppointmentsController extends GetxController {
     }
   }
 
-  // Get statistics
   int get totalAppointments => appointments.length;
-  int get pendingCount =>
-      appointments.where((a) => a.status == 'pending').length;
-  int get approvedCount =>
-      appointments.where((a) => a.status == 'approved').length;
-  int get completedCount =>
-      appointments.where((a) => a.status == 'completed').length;
-  int get rejectedCount =>
-      appointments.where((a) => a.status == 'rejected').length;
+  int get pendingCount => appointments.where((a) => a.status == 'pending').length;
+  int get confirmedCount => appointments.where((a) => a.status == 'confirmed').length;
+  int get completedCount => appointments.where((a) => a.status == 'completed').length;
+  int get rejectedCount => appointments.where((a) => a.status == 'rejected').length;
+  int get cancelledCount => appointments.where((a) => a.status == 'cancelled').length;
 }

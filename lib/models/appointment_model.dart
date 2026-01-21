@@ -10,6 +10,8 @@ class AppointmentModel {
   final String timeSlot;
   final String status;
   final double? fee;
+  final String? rejectionReason;
+  final String? cancellationReason;
 
   AppointmentModel({
     required this.id,
@@ -23,6 +25,8 @@ class AppointmentModel {
     required this.timeSlot,
     required this.status,
     this.fee,
+    this.rejectionReason,
+    this.cancellationReason,
   });
 
   factory AppointmentModel.fromJson(Map<String, dynamic> json) {
@@ -38,6 +42,8 @@ class AppointmentModel {
       timeSlot: json['time_slot'] ?? json['timeSlot'] ?? '',
       status: json['status'] ?? 'pending',
       fee: json['doctor']?['fee']?.toDouble(),
+      rejectionReason: json['rejectionReason'],
+      cancellationReason: json['cancellationReason'],
     );
   }
 
@@ -51,4 +57,11 @@ class AppointmentModel {
       'status': status,
     };
   }
+
+  // Helper method to check if appointment can be modified
+  bool get canBeModified => status == 'pending';
+  bool get isConfirmed => status == 'confirmed';
+  bool get isCompleted => status == 'completed';
+  bool get isCancelled => status == 'cancelled';
+  bool get isRejected => status == 'rejected';
 }

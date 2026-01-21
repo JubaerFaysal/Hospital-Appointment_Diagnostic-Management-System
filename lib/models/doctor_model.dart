@@ -1,6 +1,38 @@
+// Interface for day schedule configuration
+class DaySchedule {
+  final String day;
+  final String startTime;
+  final String endTime;
+
+  DaySchedule({
+    required this.day,
+    required this.startTime,
+    required this.endTime,
+  });
+
+  factory DaySchedule.fromJson(Map<String, dynamic> json) {
+    return DaySchedule(
+      day: json['day'],
+      startTime: json['startTime'],
+      endTime: json['endTime'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'day': day,
+      'startTime': startTime,
+      'endTime': endTime,
+    };
+  }
+}
+
 class DoctorModel {
   final int? id;
   final String name;
+  final String email;
+  final String password;
+  final String? phone;
   final String degrees;
   final String specialty;
   final int experience;
@@ -10,10 +42,16 @@ class DoctorModel {
   final String biography;
   final List<String>? languages;
   final Map<String, String>? slots;
+  final int? availableSlots;
+  final List<DaySchedule>? workingDays;
+  final int? consultLimitPerDay;
 
   DoctorModel({
     this.id,
     required this.name,
+    required this.email,
+    required this.password,
+    this.phone,
     required this.degrees,
     required this.specialty,
     required this.experience,
@@ -23,12 +61,18 @@ class DoctorModel {
     required this.biography,
     this.languages,
     this.slots,
+    this.availableSlots,
+    this.workingDays,
+    this.consultLimitPerDay,
   });
 
   factory DoctorModel.fromJson(Map<String, dynamic> json) {
     return DoctorModel(
       id: json['id'],
       name: json['name'],
+      email: json['email'],
+      password: json['password'] ?? '',
+      phone: json['phone'],
       degrees: json['degrees'],
       specialty: json['specialty'],
       experience: json['experience'],
@@ -42,12 +86,22 @@ class DoctorModel {
       slots: json['slots'] != null
           ? Map<String, String>.from(json['slots'])
           : null,
+      availableSlots: json['available_slots'],
+      workingDays: json['workingDays'] != null
+          ? (json['workingDays'] as List)
+              .map((item) => DaySchedule.fromJson(item))
+              .toList()
+          : null,
+      consultLimitPerDay: json['consultLimitPerDay'] ?? 30,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
+      'email': email,
+      'password': password,
+      'phone': phone,
       'degrees': degrees,
       'specialty': specialty,
       'experience': experience,
@@ -57,7 +111,9 @@ class DoctorModel {
       'biography': biography,
       'languages': languages,
       'slots': slots,
-      'available_slots': null,
+      'available_slots': availableSlots,
+      'workingDays': workingDays?.map((d) => d.toJson()).toList(),
+      'consultLimitPerDay': consultLimitPerDay ?? 30,
     };
   }
 }
