@@ -106,8 +106,8 @@ class DoctorModel {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson({bool includeStatus = false}) {
+    final json = {
       'name': name,
       'email': email,
       'password': password,
@@ -117,16 +117,47 @@ class DoctorModel {
       'experience': experience,
       'working_at': workingAt,
       'fee': fee,
-      'profilePic': profilePic,
       'biography': biography,
-      'languages': languages,
-      'slots': slots,
-      'available_slots': availableSlots,
-      'workingDays': workingDays?.map((d) => d.toJson()).toList(),
       'consultLimitPerDay': consultLimitPerDay ?? 30,
-      'status': status,
-      if (suspensionReason != null) 'suspensionReason': suspensionReason,
-      if (suspendedAt != null) 'suspendedAt': suspendedAt!.toIso8601String(),
     };
+
+    // Only include status if explicitly requested (for updates)
+    if (includeStatus) {
+      json['status'] = status;
+    }
+
+    // Only add profilePic if it's not null
+    if (profilePic != null) {
+      json['profilePic'] = profilePic;
+    }
+
+    // Only add languages if it's not null
+    if (languages != null) {
+      json['languages'] = languages;
+    }
+
+    // Only add workingDays if it's not null
+    if (workingDays != null) {
+      json['workingDays'] = workingDays!.map((d) => d.toJson()).toList();
+    }
+
+    // Only add optional fields if they're not null
+    if (slots != null) {
+      json['slots'] = slots;
+    }
+
+    if (availableSlots != null) {
+      json['available_slots'] = availableSlots;
+    }
+
+    if (suspensionReason != null) {
+      json['suspensionReason'] = suspensionReason;
+    }
+
+    if (suspendedAt != null) {
+      json['suspendedAt'] = suspendedAt!.toIso8601String();
+    }
+
+    return json;
   }
 }

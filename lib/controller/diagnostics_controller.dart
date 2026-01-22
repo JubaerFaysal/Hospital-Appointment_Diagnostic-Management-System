@@ -1,21 +1,54 @@
-import 'package:get/get.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 import '../config/api_endpoints.dart';
 import '../models/diagnostic_model.dart';
 import '../services/api_services.dart';
+import '../services/image_picker_service.dart';
 import '../utils/helpers.dart';
 
 class DiagnosticsController extends GetxController {
   final ApiService _apiService = Get.find<ApiService>();
+  final imagePickerService = ImagePickerService();
 
   final isLoading = false.obs;
   final diagnostics = <DiagnosticModel>[].obs;
   final filteredDiagnostics = <DiagnosticModel>[].obs;
 
+  // Add/Edit Diagnostic Form Controllers
+  final testNameController = TextEditingController();
+  final categoryController = TextEditingController();
+  final departmentController = TextEditingController();
+  final priceController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final preparationController = TextEditingController();
+
   @override
   void onInit() {
     super.onInit();
     loadDiagnostics();
+  }
+
+  @override
+  void onClose() {
+    testNameController.dispose();
+    categoryController.dispose();
+    departmentController.dispose();
+    priceController.dispose();
+    descriptionController.dispose();
+    preparationController.dispose();
+    super.onClose();
+  }
+
+  void clearForm() {
+    testNameController.clear();
+    categoryController.clear();
+    departmentController.clear();
+    priceController.clear();
+    descriptionController.clear();
+    preparationController.clear();
+    imagePickerService.clearImage();
   }
 
   Future<void> loadDiagnostics() async {
@@ -41,26 +74,61 @@ class DiagnosticsController extends GetxController {
 
   Future<void> createDiagnostic(DiagnosticModel diagnostic) async {
     try {
-      Helpers.showLoadingDialog();
+      // Helpers.showLoadingDialog();
 
-      // ✅ FIX: Use correct endpoint (POST to /admin-auth/diagnostics)
+      // Upload image to Cloudinary if selected
+      String? imageUrl;
+      if (imagePickerService.selectedImage.value != null) {
+        imageUrl = await imagePickerService.uploadImageToCloudinary();
+        if (imageUrl == null) {
+          // Helpers.hideLoadingDialog();
+          Helpers.showErrorSnackbar(
+            'Error',
+            'Failed to upload diagnostic image',
+          );
+          return;
+        }
+      }
+
+      // Prepare diagnostic data
+      final diagnosticData = {
+        'test_name': diagnostic.testName,
+        'category': diagnostic.category,
+        'department': diagnostic.department,
+        'price': diagnostic.price,
+        if (diagnostic.description != null)
+          'description': diagnostic.description,
+        if (diagnostic.preparation != null)
+          'preparation': diagnostic.preparation,
+        if (imageUrl != null) 'image': imageUrl,
+      };
+      // Helpers.showLoadingDialog();
+
       final response = await _apiService.post(
         ApiEndpoints.DIAGNOSTICS,
-        data: diagnostic.toJson(),
+        data: diagnosticData,
       );
+      // Helpers.hideLoadingDialog();
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        await loadDiagnostics();
+        // Helpers.hideLoadingDialog();
+        clearForm(); // Clear form before navigating back
+        Get.back(); // Close form
         Get.back(); // Close form
         Helpers.showSuccessSnackbar('Success', 'Test added successfully');
+        await loadDiagnostics(); // Reload in background
       }
     } on DioException catch (e) {
-      Helpers.showErrorSnackbar(
-        'Error',
-        e.response?.data['message'] ?? 'Failed to add test',
-      );
-    } finally {
-      Helpers.hideLoadingDialog();
+      // Helpers.hideLoadingDialog();
+      final errorMessage = e.response?.data is Map
+          ? (e.response?.data['message'] ??
+                e.response?.data['error'] ??
+                'Failed to add test')
+          : 'Failed to add test';
+      Helpers.showErrorSnackbar('Error', errorMessage);
+    } catch (e) {
+      // Helpers.hideLoadingDialog();
+      Helpers.showErrorSnackbar('Error', 'An unexpected error occurred');
     }
   }
 

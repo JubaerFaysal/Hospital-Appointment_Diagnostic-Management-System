@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../services/api_services.dart';
 import '../services/storage_services.dart';
@@ -10,10 +11,21 @@ class AuthController extends GetxController {
   final isLoading = false.obs;
   final isLoggedIn = false.obs;
 
+  // Login Form Controllers
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
   @override
   void onInit() {
     super.onInit();
     checkLoginStatus();
+  }
+
+  @override
+  void onClose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.onClose();
   }
 
   void checkLoginStatus() {

@@ -1,3 +1,5 @@
+import 'package:admin_panel_web_app/utils/helpers.dart';
+import 'package:flutter/foundation.dart' show Uint8List;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,63 +11,24 @@ import '../../utils/app_text_styles.dart';
 import '../../widgets/admin_sidebar.dart';
 import '../../widgets/custom_textfield.dart';
 
-class AddDoctorScreen extends StatefulWidget {
+class AddDoctorScreen extends StatelessWidget {
   const AddDoctorScreen({super.key});
 
-  @override
-  State<AddDoctorScreen> createState() => _AddDoctorScreenState();
-}
+  void _addWorkingDay(BuildContext context, DoctorsController controller) {
+    final List<String> days = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
 
-class _AddDoctorScreenState extends State<AddDoctorScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final controller = Get.find<DoctorsController>();
-
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _degreesController = TextEditingController();
-  final _specialtyController = TextEditingController();
-  final _experienceController = TextEditingController();
-  final _workingAtController = TextEditingController();
-  final _feeController = TextEditingController();
-  final _biographyController = TextEditingController();
-  final _languagesController = TextEditingController();
-  final _consultLimitController = TextEditingController(text: '30');
-
-  final List<DaySchedule> _workingDays = [];
-  final List<String> _days = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ];
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _phoneController.dispose();
-    _degreesController.dispose();
-    _specialtyController.dispose();
-    _experienceController.dispose();
-    _workingAtController.dispose();
-    _feeController.dispose();
-    _biographyController.dispose();
-    _languagesController.dispose();
-    _consultLimitController.dispose();
-    super.dispose();
-  }
-
-  void _addWorkingDay() {
     showDialog(
       context: context,
       builder: (context) {
-        String selectedDay = _days[0];
+        String selectedDay = days[0];
         final startTimeController = TextEditingController(text: '09:00');
         final endTimeController = TextEditingController(text: '17:00');
 
@@ -77,7 +40,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               DropdownButton<String>(
                 value: selectedDay,
                 isExpanded: true,
-                items: _days
+                items: days
                     .map(
                       (day) => DropdownMenuItem(value: day, child: Text(day)),
                     )
@@ -111,15 +74,13 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
             ),
             TextButton(
               onPressed: () {
-                setState(() {
-                  _workingDays.add(
-                    DaySchedule(
-                      day: selectedDay,
-                      startTime: startTimeController.text.trim(),
-                      endTime: endTimeController.text.trim(),
-                    ),
-                  );
-                });
+                controller.addWorkingDay(
+                  DaySchedule(
+                    day: selectedDay,
+                    startTime: startTimeController.text.trim(),
+                    endTime: endTimeController.text.trim(),
+                  ),
+                );
                 Navigator.pop(context);
               },
               child: const Text('Add'),
@@ -130,35 +91,39 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
     );
   }
 
-  void _handleSubmit() {
-    if (_formKey.currentState!.validate()) {
-      if (_workingDays.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please add at least one working day')),
+  void _handleSubmit(
+    DoctorsController controller,
+    GlobalKey<FormState> formKey,
+  ) {
+    if (formKey.currentState!.validate()) {
+      if (controller.workingDays.isEmpty) {
+        Helpers.showErrorSnackbar(
+          'Error',
+          'Please add at least one working day',
         );
         return;
       }
 
-      final languages = _languagesController.text
+      final languages = controller.languagesController.text
           .trim()
           .split(',')
           .map((e) => e.trim())
           .toList();
 
       final doctor = DoctorModel(
-        name: _nameController.text.trim(),
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        phone: _phoneController.text.trim(),
-        degrees: _degreesController.text.trim(),
-        specialty: _specialtyController.text.trim(),
-        experience: int.parse(_experienceController.text.trim()),
-        workingAt: _workingAtController.text.trim(),
-        fee: double.parse(_feeController.text.trim()),
-        biography: _biographyController.text.trim(),
+        name: controller.nameController.text.trim(),
+        email: controller.emailController.text.trim(),
+        password: controller.passwordController.text.trim(),
+        phone: controller.phoneController.text.trim(),
+        degrees: controller.degreesController.text.trim(),
+        specialty: controller.specialtyController.text.trim(),
+        experience: int.parse(controller.experienceController.text.trim()),
+        workingAt: controller.workingAtController.text.trim(),
+        fee: double.parse(controller.feeController.text.trim()),
+        biography: controller.biographyController.text.trim(),
         languages: languages,
-        workingDays: _workingDays,
-        consultLimitPerDay: int.parse(_consultLimitController.text),
+        workingDays: controller.workingDays.toList(),
+        consultLimitPerDay: int.parse(controller.consultLimitController.text),
       );
 
       controller.createDoctor(doctor);
@@ -167,6 +132,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<DoctorsController>();
+    final formKey = GlobalKey<FormState>();
     return Scaffold(
       body: Row(
         children: [
@@ -187,7 +154,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Form(
-                          key: _formKey,
+                          key: formKey,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -203,7 +170,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _nameController,
+                                      controller: controller.nameController,
                                       label: 'Full Name',
                                       hint: 'Dr. John Doe',
                                       validator: (value) {
@@ -217,7 +184,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _emailController,
+                                      controller: controller.emailController,
                                       label: 'Email',
                                       hint: 'doctor@example.com',
                                       keyboardType: TextInputType.emailAddress,
@@ -241,7 +208,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _passwordController,
+                                      controller: controller.passwordController,
                                       label: 'Password',
                                       hint: 'SecurePass123!',
                                       obscureText: true,
@@ -259,7 +226,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _phoneController,
+                                      controller: controller.phoneController,
                                       label: 'Phone Number',
                                       hint: '+880-1711223344',
                                       validator: (value) {
@@ -279,7 +246,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _degreesController,
+                                      controller: controller.degreesController,
                                       label: 'Degrees',
                                       hint: 'MD, MBBS, DM Cardiology',
                                       validator: (value) {
@@ -293,7 +260,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _specialtyController,
+                                      controller:
+                                          controller.specialtyController,
                                       label: 'Specialty',
                                       hint: 'Cardiology',
                                       validator: (value) {
@@ -313,7 +281,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _experienceController,
+                                      controller:
+                                          controller.experienceController,
                                       label: 'Experience (Years)',
                                       hint: '12',
                                       keyboardType: TextInputType.number,
@@ -331,7 +300,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _workingAtController,
+                                      controller:
+                                          controller.workingAtController,
                                       label: 'Working At',
                                       hint: 'City Heart Hospital',
                                       validator: (value) {
@@ -351,7 +321,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _feeController,
+                                      controller: controller.feeController,
                                       label: 'Consultation Fee (৳)',
                                       hint: '500',
                                       keyboardType: TextInputType.number,
@@ -369,7 +339,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _consultLimitController,
+                                      controller:
+                                          controller.consultLimitController,
                                       label: 'Consult Limit Per Day',
                                       hint: '30',
                                       keyboardType: TextInputType.number,
@@ -393,7 +364,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _languagesController,
+                                      controller:
+                                          controller.languagesController,
                                       label: 'Languages (comma-separated)',
                                       hint: 'Bangla, English, Hindi',
                                       validator: (value) {
@@ -410,7 +382,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                               SizedBox(height: 20.h),
 
                               CustomTextField(
-                                controller: _biographyController,
+                                controller: controller.biographyController,
                                 label: 'Biography',
                                 hint:
                                     'Experienced cardiologist with 12 years of clinical practice...',
@@ -422,7 +394,114 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                   return null;
                                 },
                               ),
+                              SizedBox(height: 24.h),
 
+                              // Image picker section
+                              Container(
+                                padding: EdgeInsets.all(16.w),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey[300]!),
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Profile Picture',
+                                      style: AppTextStyles.body2.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 12.h),
+                                    Obx(() {
+                                      final imageFile = controller
+                                          .imagePickerService
+                                          .selectedImage
+                                          .value;
+                                      final hasImage = imageFile != null;
+
+                                      return Column(
+                                        children: [
+                                          if (hasImage)
+                                            Container(
+                                              height: 200.h,
+                                              width: double.infinity,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Colors.grey[300]!,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
+                                                child: FutureBuilder<Uint8List>(
+                                                  future: imageFile
+                                                      .readAsBytes(),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.hasData) {
+                                                      return Image.memory(
+                                                        snapshot.data!,
+                                                        fit: BoxFit.cover,
+                                                      );
+                                                    }
+                                                    return const Center(
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          SizedBox(height: 12.h),
+                                          Row(
+                                            children: [
+                                              ElevatedButton.icon(
+                                                onPressed: () => controller
+                                                    .imagePickerService
+                                                    .pickImage(),
+                                                icon: Icon(
+                                                  hasImage
+                                                      ? Icons.edit
+                                                      : Icons
+                                                            .add_photo_alternate,
+                                                ),
+                                                label: Text(
+                                                  hasImage
+                                                      ? 'Change Image'
+                                                      : 'Select Image',
+                                                ),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      AppColors.primary,
+                                                ),
+                                              ),
+                                              if (hasImage) ...[
+                                                SizedBox(width: 12.w),
+                                                OutlinedButton.icon(
+                                                  onPressed: () => controller
+                                                      .imagePickerService
+                                                      .clearImage(),
+                                                  icon: const Icon(
+                                                    Icons.delete_outline,
+                                                  ),
+                                                  label: const Text('Remove'),
+                                                  style:
+                                                      OutlinedButton.styleFrom(
+                                                        foregroundColor:
+                                                            Colors.red,
+                                                      ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                                  ],
+                                ),
+                              ),
                               SizedBox(height: 24.h),
 
                               Container(
@@ -443,7 +522,10 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                           style: AppTextStyles.body2,
                                         ),
                                         ElevatedButton.icon(
-                                          onPressed: _addWorkingDay,
+                                          onPressed: () => _addWorkingDay(
+                                            context,
+                                            controller,
+                                          ),
                                           icon: const Icon(Icons.add),
                                           label: const Text('Add Day'),
                                           style: ElevatedButton.styleFrom(
@@ -453,19 +535,23 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                       ],
                                     ),
                                     SizedBox(height: 12.h),
-                                    if (_workingDays.isEmpty)
-                                      Text(
-                                        'No working days added yet',
-                                        style: AppTextStyles.body2.copyWith(
-                                          color: Colors.grey,
-                                        ),
-                                      )
-                                    else
-                                      ListView.builder(
+                                    Obx(() {
+                                      if (controller.workingDays.isEmpty) {
+                                        return Text(
+                                          'No working days added yet',
+                                          style: AppTextStyles.body2.copyWith(
+                                            color: Colors.grey,
+                                          ),
+                                        );
+                                      }
+
+                                      return ListView.builder(
                                         shrinkWrap: true,
-                                        itemCount: _workingDays.length,
+                                        itemCount:
+                                            controller.workingDays.length,
                                         itemBuilder: (context, index) {
-                                          final day = _workingDays[index];
+                                          final day =
+                                              controller.workingDays[index];
                                           return Padding(
                                             padding: EdgeInsets.only(top: 8.h),
                                             child: Row(
@@ -478,13 +564,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                                   style: AppTextStyles.body2,
                                                 ),
                                                 IconButton(
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      _workingDays.removeAt(
-                                                        index,
-                                                      );
-                                                    });
-                                                  },
+                                                  onPressed: () => controller
+                                                      .removeWorkingDay(index),
                                                   icon: const Icon(
                                                     Icons.delete,
                                                     color: Colors.red,
@@ -500,7 +581,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                             ),
                                           );
                                         },
-                                      ),
+                                      );
+                                    }),
                                   ],
                                 ),
                               ),
@@ -522,7 +604,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                                   ),
                                   SizedBox(width: 16.w),
                                   ElevatedButton(
-                                    onPressed: _handleSubmit,
+                                    onPressed: () =>
+                                        _handleSubmit(controller, formKey),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.primary,
                                       padding: EdgeInsets.symmetric(

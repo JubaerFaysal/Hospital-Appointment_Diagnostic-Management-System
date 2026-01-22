@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show Uint8List;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,44 +10,18 @@ import '../../utils/app_text_styles.dart';
 import '../../widgets/admin_sidebar.dart';
 import '../../widgets/custom_textfield.dart';
 
-class AddDiagnosticScreen extends StatefulWidget {
-  const AddDiagnosticScreen({Key? key}) : super(key: key);
+class AddDiagnosticScreen extends StatelessWidget {
+  const AddDiagnosticScreen({super.key});
 
-  @override
-  State<AddDiagnosticScreen> createState() => _AddDiagnosticScreenState();
-}
-
-class _AddDiagnosticScreenState extends State<AddDiagnosticScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final controller = Get.find<DiagnosticsController>();
-
-  final _testNameController = TextEditingController();
-  final _categoryController = TextEditingController();
-  final _departmentController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _preparationController = TextEditingController();
-
-  @override
-  void dispose() {
-    _testNameController.dispose();
-    _categoryController.dispose();
-    _departmentController.dispose();
-    _priceController.dispose();
-    _descriptionController.dispose();
-    _preparationController.dispose();
-    super.dispose();
-  }
-
-  void _handleSubmit() {
-    if (_formKey.currentState!.validate()) {
+  void _handleSubmit(DiagnosticsController controller, GlobalKey<FormState> formKey) {
+    if (formKey.currentState!.validate()) {
       final diagnostic = DiagnosticModel(
-        testName: _testNameController.text.trim(),
-        category: _categoryController.text.trim(),
-        department: _departmentController.text.trim(),
-        price: double.parse(_priceController.text.trim()),
-        description: _descriptionController.text.trim(),
-        preparation: _preparationController.text.trim(),
+        testName: controller.testNameController.text.trim(),
+        category: controller.categoryController.text.trim(),
+        department: controller.departmentController.text.trim(),
+        price: double.parse(controller.priceController.text.trim()),
+        description: controller.descriptionController.text.trim(),
+        preparation: controller.preparationController.text.trim(),
       );
 
       controller.createDiagnostic(diagnostic);
@@ -55,6 +30,9 @@ class _AddDiagnosticScreenState extends State<AddDiagnosticScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(DiagnosticsController());
+    final formKey = GlobalKey<FormState>();
+
     return Scaffold(
       body: Row(
         children: [
@@ -75,7 +53,7 @@ class _AddDiagnosticScreenState extends State<AddDiagnosticScreen> {
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Form(
-                          key: _formKey,
+                          key: formKey,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -88,7 +66,7 @@ class _AddDiagnosticScreenState extends State<AddDiagnosticScreen> {
                               SizedBox(height: 24.h),
 
                               CustomTextField(
-                                controller: _testNameController,
+                                controller: controller.testNameController,
                                 label: 'Test Name',
                                 hint: 'Complete Blood Count (CBC)',
                                 validator: (value) {
@@ -105,7 +83,7 @@ class _AddDiagnosticScreenState extends State<AddDiagnosticScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _categoryController,
+                                      controller: controller.categoryController,
                                       label: 'Category',
                                       hint: 'Blood Tests',
                                       validator: (value) {
@@ -119,7 +97,7 @@ class _AddDiagnosticScreenState extends State<AddDiagnosticScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _departmentController,
+                                      controller: controller.departmentController,
                                       label: 'Department',
                                       hint: 'Pathology',
                                       validator: (value) {
@@ -136,7 +114,7 @@ class _AddDiagnosticScreenState extends State<AddDiagnosticScreen> {
                               SizedBox(height: 20.h),
 
                               CustomTextField(
-                                controller: _priceController,
+                                controller: controller.priceController,
                                 label: 'Price (৳)',
                                 hint: '500',
                                 keyboardType: TextInputType.number,
@@ -154,7 +132,7 @@ class _AddDiagnosticScreenState extends State<AddDiagnosticScreen> {
                               SizedBox(height: 20.h),
 
                               CustomTextField(
-                                controller: _descriptionController,
+                                controller: controller.descriptionController,
                                 label: 'Description',
                                 hint: 'Brief description of the test...',
                                 maxLines: 3,
@@ -163,10 +141,115 @@ class _AddDiagnosticScreenState extends State<AddDiagnosticScreen> {
                               SizedBox(height: 20.h),
 
                               CustomTextField(
-                                controller: _preparationController,
+                                controller: controller.preparationController,
                                 label: 'Preparation Required',
                                 hint: 'Fasting for 8-12 hours...',
                                 maxLines: 3,
+                              ),
+
+                              SizedBox(height: 20.h),
+
+                              // Image picker section
+                              Container(
+                                padding: EdgeInsets.all(16.w),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey[300]!),
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Test Image',
+                                      style: AppTextStyles.body2.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 12.h),
+                                    Obx(() {
+                                      final imageFile = controller
+                                          .imagePickerService
+                                          .selectedImage
+                                          .value;
+                                      final hasImage = imageFile != null;
+
+                                      return Column(
+                                        children: [
+                                          if (hasImage)
+                                            Container(
+                                              height: 200.h,
+                                              width: double.infinity,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Colors.grey[300]!,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
+                                                child: FutureBuilder<Uint8List>(
+                                                  future: imageFile.readAsBytes(),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.hasData) {
+                                                      return Image.memory(
+                                                        snapshot.data!,
+                                                        fit: BoxFit.cover,
+                                                      );
+                                                    }
+                                                    return const Center(
+                                                      child: CircularProgressIndicator(),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          SizedBox(height: 12.h),
+                                          Row(
+                                            children: [
+                                              ElevatedButton.icon(
+                                                onPressed: () => controller
+                                                    .imagePickerService
+                                                    .pickImage(),
+                                                icon: Icon(
+                                                  hasImage
+                                                      ? Icons.edit
+                                                      : Icons.add_photo_alternate,
+                                                ),
+                                                label: Text(
+                                                  hasImage
+                                                      ? 'Change Image'
+                                                      : 'Select Image',
+                                                ),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      AppColors.secondary,
+                                                ),
+                                              ),
+                                              if (hasImage) ...[
+                                                SizedBox(width: 12.w),
+                                                OutlinedButton.icon(
+                                                  onPressed: () => controller
+                                                      .imagePickerService
+                                                      .clearImage(),
+                                                  icon: const Icon(
+                                                    Icons.delete_outline,
+                                                  ),
+                                                  label: const Text('Remove'),
+                                                  style:
+                                                      OutlinedButton.styleFrom(
+                                                    foregroundColor: Colors.red,
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                                  ],
+                                ),
                               ),
 
                               SizedBox(height: 32.h),
@@ -186,7 +269,7 @@ class _AddDiagnosticScreenState extends State<AddDiagnosticScreen> {
                                   ),
                                   SizedBox(width: 16.w),
                                   ElevatedButton(
-                                    onPressed: _handleSubmit,
+                                    onPressed: () => _handleSubmit(controller, formKey),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.secondary,
                                       padding: EdgeInsets.symmetric(

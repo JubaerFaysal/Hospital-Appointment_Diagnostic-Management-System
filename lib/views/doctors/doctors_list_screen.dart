@@ -8,33 +8,8 @@ import '../../utils/app_text_styles.dart';
 import '../../widgets/admin_sidebar.dart';
 import '../../widgets/doctor_filter_panel.dart';
 
-class DoctorsListScreen extends StatefulWidget {
+class DoctorsListScreen extends GetView<DoctorsController> {
   const DoctorsListScreen({super.key});
-
-  @override
-  State<DoctorsListScreen> createState() => _DoctorsListScreenState();
-}
-
-class _DoctorsListScreenState extends State<DoctorsListScreen> {
-  bool showFilters = false;
-  // Initialize controller lazily or find if updated
-  late final DoctorsController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    // Ensure controller is available
-    if (Get.isRegistered<DoctorsController>()) {
-      controller = Get.find<DoctorsController>();
-    } else {
-      controller = Get.put(DoctorsController());
-    }
-
-    // Load data after build frame to avoid blocking/state issues during init
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.loadDoctorsWithAppointments();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +45,12 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
                     ),
                   ),
                   // Filter Panel
-                  if (showFilters) const DoctorFilterPanel(),
+                  Obx(() {
+                    if (controller.showFilters.value) {
+                      return const DoctorFilterPanel();
+                    }
+                    return const SizedBox.shrink();
+                  }),
                 ],
               ),
             ),
@@ -123,17 +103,17 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
                   // Filter Toggle Button
                   Obx(
                     () => OutlinedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          showFilters = !showFilters;
-                        });
-                      },
+                      onPressed: controller.toggleFilters,
                       icon: Icon(
-                        showFilters ? Icons.filter_list_off : Icons.filter_list,
+                        controller.showFilters.value
+                            ? Icons.filter_list_off
+                            : Icons.filter_list,
                         size: 18.sp,
                       ),
                       label: Text(
-                        showFilters ? 'Hide Filters' : 'Show Filters',
+                        controller.showFilters.value
+                            ? 'Hide Filters'
+                            : 'Show Filters',
                       ),
                       style: OutlinedButton.styleFrom(
                         padding: EdgeInsets.symmetric(
@@ -156,16 +136,17 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
                       decoration: InputDecoration(
                         hintText: 'Search doctors...',
                         prefixIcon: const Icon(Icons.search),
+                        isDense: true,
                         filled: true,
                         fillColor: AppColors.background,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.r),
                           borderSide: BorderSide.none,
                         ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 12.h,
-                        ),
+                        // contentPadding: EdgeInsets.symmetric(
+                        //   horizontal: 16.w,
+                        //   vertical: 12.h,
+                        // ),
                       ),
                       onChanged: controller.searchDoctors,
                     ),

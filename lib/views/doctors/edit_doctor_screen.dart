@@ -9,77 +9,13 @@ import '../../utils/app_text_styles.dart';
 import '../../widgets/admin_sidebar.dart';
 import '../../widgets/custom_textfield.dart';
 
-class EditDoctorScreen extends StatefulWidget {
-  const EditDoctorScreen({super.key});
 
-  @override
-  State<EditDoctorScreen> createState() => _EditDoctorScreenState();
-}
+class EditDoctorScreen extends StatelessWidget {
+  EditDoctorScreen({super.key});
 
-class _EditDoctorScreenState extends State<EditDoctorScreen> {
   final _formKey = GlobalKey<FormState>();
-  final controller = Get.find<DoctorsController>();
-  late DoctorModel doctor;
 
-  late TextEditingController _nameController;
-  late TextEditingController _emailController;
-  late TextEditingController _passwordController;
-  late TextEditingController _phoneController;
-  late TextEditingController _degreesController;
-  late TextEditingController _specialtyController;
-  late TextEditingController _experienceController;
-  late TextEditingController _workingAtController;
-  late TextEditingController _feeController;
-  late TextEditingController _biographyController;
-  late TextEditingController _languagesController;
-  late TextEditingController _consultLimitController;
-
-  late List<DaySchedule> _workingDays;
-
-  @override
-  void initState() {
-    super.initState();
-    doctor = Get.arguments as DoctorModel;
-
-    _nameController = TextEditingController(text: doctor.name);
-    _emailController = TextEditingController(text: doctor.email);
-    _passwordController = TextEditingController(text: doctor.password);
-    _phoneController = TextEditingController(text: doctor.phone ?? '');
-    _degreesController = TextEditingController(text: doctor.degrees);
-    _specialtyController = TextEditingController(text: doctor.specialty);
-    _experienceController = TextEditingController(
-      text: doctor.experience.toString(),
-    );
-    _workingAtController = TextEditingController(text: doctor.workingAt);
-    _feeController = TextEditingController(text: doctor.fee.toString());
-    _biographyController = TextEditingController(text: doctor.biography);
-    _languagesController = TextEditingController(
-      text: doctor.languages?.join(', ') ?? '',
-    );
-    _consultLimitController = TextEditingController(
-      text: (doctor.consultLimitPerDay ?? 30).toString(),
-    );
-    _workingDays = doctor.workingDays ?? [];
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _phoneController.dispose();
-    _degreesController.dispose();
-    _specialtyController.dispose();
-    _experienceController.dispose();
-    _workingAtController.dispose();
-    _feeController.dispose();
-    _biographyController.dispose();
-    _languagesController.dispose();
-    _consultLimitController.dispose();
-    super.dispose();
-  }
-
-  void _addWorkingDay() {
+  void _addWorkingDay(BuildContext context, DoctorsController controller) {
     final List<String> days = [
       'Sunday',
       'Monday',
@@ -139,15 +75,13 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
             ),
             TextButton(
               onPressed: () {
-                setState(() {
-                  _workingDays.add(
-                    DaySchedule(
-                      day: selectedDay,
-                      startTime: startTimeController.text.trim(),
-                      endTime: endTimeController.text.trim(),
-                    ),
-                  );
-                });
+                controller.addWorkingDay(
+                  DaySchedule(
+                    day: selectedDay,
+                    startTime: startTimeController.text.trim(),
+                    endTime: endTimeController.text.trim(),
+                  ),
+                );
                 Navigator.pop(context);
               },
               child: const Text('Add'),
@@ -158,16 +92,16 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
     );
   }
 
-  void _handleSubmit() {
+  void _handleSubmit(BuildContext context, DoctorsController controller, DoctorModel doctor) {
     if (_formKey.currentState!.validate()) {
-      if (_workingDays.isEmpty) {
+      if (controller.workingDays.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please add at least one working day')),
         );
         return;
       }
 
-      final languages = _languagesController.text
+      final languages = controller.languagesController.text
           .trim()
           .split(',')
           .map((e) => e.trim())
@@ -175,27 +109,45 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
 
       final updatedDoctor = DoctorModel(
         id: doctor.id,
-        name: _nameController.text.trim(),
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        phone: _phoneController.text.trim(),
-        degrees: _degreesController.text.trim(),
-        specialty: _specialtyController.text.trim(),
-        experience: int.parse(_experienceController.text.trim()),
-        workingAt: _workingAtController.text.trim(),
-        fee: double.parse(_feeController.text.trim()),
-        biography: _biographyController.text.trim(),
+        name: controller.nameController.text.trim(),
+        email: controller.emailController.text.trim(),
+        password: controller.passwordController.text.trim(),
+        phone: controller.phoneController.text.trim(),
+        degrees: controller.degreesController.text.trim(),
+        specialty: controller.specialtyController.text.trim(),
+        experience: int.parse(controller.experienceController.text.trim()),
+        workingAt: controller.workingAtController.text.trim(),
+        fee: double.parse(controller.feeController.text.trim()),
+        biography: controller.biographyController.text.trim(),
         languages: languages,
-        workingDays: _workingDays,
-        consultLimitPerDay: int.parse(_consultLimitController.text),
+        workingDays: controller.workingDays,
+        consultLimitPerDay: int.parse(controller.consultLimitController.text),
       );
 
       controller.updateDoctor(doctor.id!, updatedDoctor);
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<DoctorsController>();
+    final doctor = Get.arguments as DoctorModel;
+    // Pre-fill controller fields if not already set
+    controller.nameController.text = doctor.name;
+    controller.emailController.text = doctor.email;
+    controller.passwordController.text = doctor.password;
+    controller.phoneController.text = doctor.phone ?? '';
+    controller.degreesController.text = doctor.degrees;
+    controller.specialtyController.text = doctor.specialty;
+    controller.experienceController.text = doctor.experience.toString();
+    controller.workingAtController.text = doctor.workingAt;
+    controller.feeController.text = doctor.fee.toString();
+    controller.biographyController.text = doctor.biography;
+    controller.languagesController.text = doctor.languages?.join(', ') ?? '';
+    controller.consultLimitController.text = (doctor.consultLimitPerDay ?? 30).toString();
+    controller.workingDays.value = doctor.workingDays ?? [];
+
     return Scaffold(
       body: Row(
         children: [
@@ -232,7 +184,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _nameController,
+                                      controller: controller.nameController,
                                       label: 'Full Name',
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -245,7 +197,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _emailController,
+                                      controller: controller.emailController,
                                       label: 'Email',
                                       keyboardType: TextInputType.emailAddress,
                                       validator: (value) {
@@ -268,7 +220,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _passwordController,
+                                      controller: controller.passwordController,
                                       label: 'Password',
                                       obscureText: true,
                                       validator: (value) {
@@ -285,7 +237,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _phoneController,
+                                      controller: controller.phoneController,
                                       label: 'Phone Number',
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -304,7 +256,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _degreesController,
+                                      controller: controller.degreesController,
                                       label: 'Degrees',
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -317,7 +269,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _specialtyController,
+                                      controller: controller.specialtyController,
                                       label: 'Specialty',
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -336,7 +288,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _experienceController,
+                                      controller: controller.experienceController,
                                       label: 'Experience (Years)',
                                       keyboardType: TextInputType.number,
                                       validator: (value) {
@@ -353,7 +305,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _workingAtController,
+                                      controller: controller.workingAtController,
                                       label: 'Working At',
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -372,7 +324,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _feeController,
+                                      controller: controller.feeController,
                                       label: 'Consultation Fee (৳)',
                                       keyboardType: TextInputType.number,
                                       validator: (value) {
@@ -389,7 +341,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _consultLimitController,
+                                      controller: controller.consultLimitController,
                                       label: 'Consult Limit Per Day',
                                       keyboardType: TextInputType.number,
                                       validator: (value) {
@@ -412,7 +364,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _languagesController,
+                                      controller: controller.languagesController,
                                       label: 'Languages (comma-separated)',
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -428,7 +380,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                               SizedBox(height: 20.h),
 
                               CustomTextField(
-                                controller: _biographyController,
+                                controller: controller.biographyController,
                                 label: 'Biography',
                                 maxLines: 5,
                                 validator: (value) {
@@ -459,7 +411,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                           style: AppTextStyles.body2,
                                         ),
                                         ElevatedButton.icon(
-                                          onPressed: _addWorkingDay,
+                                          onPressed: () => _addWorkingDay(context, controller),
                                           icon: const Icon(Icons.add),
                                           label: const Text('Add Day'),
                                           style: ElevatedButton.styleFrom(
@@ -469,54 +421,49 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                       ],
                                     ),
                                     SizedBox(height: 12.h),
-                                    if (_workingDays.isEmpty)
-                                      Text(
-                                        'No working days added yet',
-                                        style: AppTextStyles.body2.copyWith(
-                                          color: Colors.grey,
-                                        ),
-                                      )
-                                    else
-                                      ListView.builder(
-                                        shrinkWrap: true,
-                                        itemCount: _workingDays.length,
-                                        itemBuilder: (context, index) {
-                                          final day = _workingDays[index];
-                                          return Padding(
-                                            padding: EdgeInsets.only(top: 8.h),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  '${day.day}: ${day.startTime} - ${day.endTime}',
-                                                  style: AppTextStyles.body2,
-                                                ),
-                                                IconButton(
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      _workingDays.removeAt(
-                                                        index,
-                                                      );
-                                                    });
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.delete,
-                                                    color: Colors.red,
+                                    Obx(() {
+                                      if (controller.workingDays.isEmpty) {
+                                        return Text(
+                                          'No working days added yet',
+                                          style: AppTextStyles.body2.copyWith(
+                                            color: Colors.grey,
+                                          ),
+                                        );
+                                      } else {
+                                        return ListView.builder(
+                                          shrinkWrap: true,
+                                          itemCount: controller.workingDays.length,
+                                          itemBuilder: (context, index) {
+                                            final day = controller.workingDays[index];
+                                            return Padding(
+                                              padding: EdgeInsets.only(top: 8.h),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    '${day.day}: ${day.startTime} - ${day.endTime}',
+                                                    style: AppTextStyles.body2,
                                                   ),
-                                                  constraints: BoxConstraints(
-                                                    minWidth: 24.w,
-                                                    minHeight: 24.h,
+                                                  IconButton(
+                                                    onPressed: () => controller.removeWorkingDay(index),
+                                                    icon: const Icon(
+                                                      Icons.delete,
+                                                      color: Colors.red,
+                                                    ),
+                                                    constraints: BoxConstraints(
+                                                      minWidth: 24.w,
+                                                      minHeight: 24.h,
+                                                    ),
+                                                    padding: EdgeInsets.zero,
+                                                    iconSize: 18.sp,
                                                   ),
-                                                  padding: EdgeInsets.zero,
-                                                  iconSize: 18.sp,
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      }
+                                    }),
                                   ],
                                 ),
                               ),
@@ -538,7 +485,7 @@ class _EditDoctorScreenState extends State<EditDoctorScreen> {
                                   ),
                                   SizedBox(width: 16.w),
                                   ElevatedButton(
-                                    onPressed: _handleSubmit,
+                                    onPressed: () => _handleSubmit(context, controller, doctor),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.primary,
                                       padding: EdgeInsets.symmetric(

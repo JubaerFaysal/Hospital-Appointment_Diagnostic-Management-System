@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../bindings/doctor_bindings.dart';
 import '../views/analytics/analytics_screen.dart';
 import '../views/analytics/dashboard_screen.dart';
 import '../views/appointments_list_screen.dart';
@@ -19,11 +20,11 @@ class AdminPages {
   static final routes = [
     GetPage(name: AdminRoutes.LOGIN, page: () => const LoginScreen()),
     GetPage(name: AdminRoutes.DASHBOARD, page: () => const DashboardScreen()),
-    GetPage(name: AdminRoutes.DOCTORS, page: () => const DoctorsListScreen()),
+    GetPage(name: AdminRoutes.DOCTORS, page: () => const DoctorsListScreen(), binding: DoctorsBinding(),),
     GetPage(name: AdminRoutes.DOCTORS_ADD, page: () => const AddDoctorScreen()),
     GetPage(
       name: AdminRoutes.DOCTORS_EDIT,
-      page: () => const EditDoctorScreen(),
+      page: () => EditDoctorScreen(),
     ),
     GetPage(
       name: AdminRoutes.DOCTORS_DETAIL,
@@ -43,7 +44,7 @@ class AdminPages {
     ),
     GetPage(
       name: AdminRoutes.DIAGNOSTICS_EDIT,
-      page: () => const EditDiagnosticScreen(),
+      page: () =>  EditDiagnosticScreen(),
     ),
     GetPage(
       name: AdminRoutes.APPOINTMENTS,

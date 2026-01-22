@@ -9,71 +9,41 @@ import '../../utils/app_text_styles.dart';
 import '../../widgets/admin_sidebar.dart';
 import '../../widgets/custom_textfield.dart';
 
-class EditDiagnosticScreen extends StatefulWidget {
-  const EditDiagnosticScreen({Key? key}) : super(key: key);
 
-  @override
-  State<EditDiagnosticScreen> createState() => _EditDiagnosticScreenState();
-}
+class EditDiagnosticScreen extends StatelessWidget {
+  EditDiagnosticScreen({Key? key}) : super(key: key);
 
-class _EditDiagnosticScreenState extends State<EditDiagnosticScreen> {
   final _formKey = GlobalKey<FormState>();
-  final controller = Get.find<DiagnosticsController>();
-  late DiagnosticModel diagnostic;
 
-  late TextEditingController _testNameController;
-  late TextEditingController _categoryController;
-  late TextEditingController _departmentController;
-  late TextEditingController _priceController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _preparationController;
-
-  @override
-  void initState() {
-    super.initState();
-    diagnostic = Get.arguments as DiagnosticModel;
-
-    _testNameController = TextEditingController(text: diagnostic.testName);
-    _categoryController = TextEditingController(text: diagnostic.category);
-    _departmentController = TextEditingController(text: diagnostic.department);
-    _priceController = TextEditingController(text: diagnostic.price.toString());
-    _descriptionController = TextEditingController(
-      text: diagnostic.description ?? '',
-    );
-    _preparationController = TextEditingController(
-      text: diagnostic.preparation ?? '',
-    );
-  }
-
-  @override
-  void dispose() {
-    _testNameController.dispose();
-    _categoryController.dispose();
-    _departmentController.dispose();
-    _priceController.dispose();
-    _descriptionController.dispose();
-    _preparationController.dispose();
-    super.dispose();
-  }
-
-  void _handleSubmit() {
+  void _handleSubmit(BuildContext context, DiagnosticsController controller, DiagnosticModel diagnostic) {
     if (_formKey.currentState!.validate()) {
       final updatedDiagnostic = DiagnosticModel(
         id: diagnostic.id,
-        testName: _testNameController.text.trim(),
-        category: _categoryController.text.trim(),
-        department: _departmentController.text.trim(),
-        price: double.parse(_priceController.text.trim()),
-        description: _descriptionController.text.trim(),
-        preparation: _preparationController.text.trim(),
+        testName: controller.testNameController.text.trim(),
+        category: controller.categoryController.text.trim(),
+        department: controller.departmentController.text.trim(),
+        price: double.parse(controller.priceController.text.trim()),
+        description: controller.descriptionController.text.trim(),
+        preparation: controller.preparationController.text.trim(),
       );
 
       controller.updateDiagnostic(diagnostic.id!, updatedDiagnostic);
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<DiagnosticsController>();
+    final diagnostic = Get.arguments as DiagnosticModel;
+    // Pre-fill controller fields if not already set
+    controller.testNameController.text = diagnostic.testName;
+    controller.categoryController.text = diagnostic.category;
+    controller.departmentController.text = diagnostic.department;
+    controller.priceController.text = diagnostic.price.toString();
+    controller.descriptionController.text = diagnostic.description ?? '';
+    controller.preparationController.text = diagnostic.preparation ?? '';
+
     return Scaffold(
       body: Row(
         children: [
@@ -107,7 +77,7 @@ class _EditDiagnosticScreenState extends State<EditDiagnosticScreen> {
                               SizedBox(height: 24.h),
 
                               CustomTextField(
-                                controller: _testNameController,
+                                controller: controller.testNameController,
                                 label: 'Test Name',
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -123,7 +93,7 @@ class _EditDiagnosticScreenState extends State<EditDiagnosticScreen> {
                                 children: [
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _categoryController,
+                                      controller: controller.categoryController,
                                       label: 'Category',
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -136,7 +106,7 @@ class _EditDiagnosticScreenState extends State<EditDiagnosticScreen> {
                                   SizedBox(width: 20.w),
                                   Expanded(
                                     child: CustomTextField(
-                                      controller: _departmentController,
+                                      controller: controller.departmentController,
                                       label: 'Department',
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -152,7 +122,7 @@ class _EditDiagnosticScreenState extends State<EditDiagnosticScreen> {
                               SizedBox(height: 20.h),
 
                               CustomTextField(
-                                controller: _priceController,
+                                controller: controller.priceController,
                                 label: 'Price (৳)',
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
@@ -169,7 +139,7 @@ class _EditDiagnosticScreenState extends State<EditDiagnosticScreen> {
                               SizedBox(height: 20.h),
 
                               CustomTextField(
-                                controller: _descriptionController,
+                                controller: controller.descriptionController,
                                 label: 'Description',
                                 maxLines: 3,
                               ),
@@ -177,7 +147,7 @@ class _EditDiagnosticScreenState extends State<EditDiagnosticScreen> {
                               SizedBox(height: 20.h),
 
                               CustomTextField(
-                                controller: _preparationController,
+                                controller: controller.preparationController,
                                 label: 'Preparation Required',
                                 maxLines: 3,
                               ),
@@ -199,7 +169,7 @@ class _EditDiagnosticScreenState extends State<EditDiagnosticScreen> {
                                   ),
                                   SizedBox(width: 16.w),
                                   ElevatedButton(
-                                    onPressed: _handleSubmit,
+                                    onPressed: () => _handleSubmit(context, controller, diagnostic),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.secondary,
                                       padding: EdgeInsets.symmetric(

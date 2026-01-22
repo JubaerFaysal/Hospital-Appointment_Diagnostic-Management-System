@@ -1,15 +1,18 @@
 import 'package:admin_panel_web_app/main.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../config/api_endpoints.dart';
 import '../models/appointment_model.dart';
 import '../models/doctor_model.dart';
 import '../services/api_services.dart';
+import '../services/image_picker_service.dart';
 import '../utils/helpers.dart';
 
 class DoctorsController extends GetxController {
   final ApiService _apiService = Get.find<ApiService>();
+  final imagePickerService = ImagePickerService();
 
   final isLoading = false.obs;
   final doctors = <DoctorModel>[].obs;
@@ -29,11 +32,76 @@ class DoctorsController extends GetxController {
   final availableSpecialties = <String>[].obs;
   final sortBy = 'name'.obs; // name, experience, fee, status
   final sortAscending = true.obs;
+  final showFilters = false.obs;
+
+  // Add/Edit Doctor Form Controllers
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final phoneController = TextEditingController();
+  final degreesController = TextEditingController();
+  final specialtyController = TextEditingController();
+  final experienceController = TextEditingController();
+  final workingAtController = TextEditingController();
+  final feeController = TextEditingController();
+  final biographyController = TextEditingController();
+  final languagesController = TextEditingController();
+  final consultLimitController = TextEditingController();
+  
+  // Working days management
+  final workingDays = <DaySchedule>[].obs;
 
   @override
   void onInit() {
     super.onInit();
+    consultLimitController.text = '30';
     loadDoctors();
+  }
+
+  @override
+  void onClose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    phoneController.dispose();
+    degreesController.dispose();
+    specialtyController.dispose();
+    experienceController.dispose();
+    workingAtController.dispose();
+    feeController.dispose();
+    biographyController.dispose();
+    languagesController.dispose();
+    consultLimitController.dispose();
+    super.onClose();
+  }
+
+  void clearForm() {
+    nameController.clear();
+    emailController.clear();
+    passwordController.clear();
+    phoneController.clear();
+    degreesController.clear();
+    specialtyController.clear();
+    experienceController.clear();
+    workingAtController.clear();
+    feeController.clear();
+    biographyController.clear();
+    languagesController.clear();
+    consultLimitController.text = '30';
+    workingDays.clear();
+    imagePickerService.clearImage();
+  }
+
+  void addWorkingDay(DaySchedule day) {
+    workingDays.add(day);
+  }
+
+  void removeWorkingDay(int index) {
+    workingDays.removeAt(index);
+  }
+
+  void toggleFilters() {
+    showFilters.value = !showFilters.value;
   }
 
   Future<void> loadDoctors() async {
@@ -79,26 +147,86 @@ class DoctorsController extends GetxController {
 
   Future<void> createDoctor(DoctorModel doctor) async {
     try {
-      Helpers.showLoadingDialog();
+      isLoading.value = true;
+      //Helpers.showLoadingDialog();
 
-      // ✅ FIX: Use correct endpoint (POST to /admin-auth/doctors)
+      // Upload image to Cloudinary if selected
+      String? profilePicUrl;
+      if (imagePickerService.selectedImage.value != null) {
+        profilePicUrl = await imagePickerService.uploadImageToCloudinary();
+        if (profilePicUrl == null) {
+          isLoading.value = false;
+          //Helpers.hideLoadingDialog();
+          Helpers.showErrorSnackbar('Error', 'Failed to upload profile image');
+          return;
+        }
+      }
+
+      // Prepare doctor data
+      final doctorData = {
+        'name': doctor.name,
+        'email': doctor.email,
+        'password': doctor.password,
+        'phone': doctor.phone,
+        'degrees': doctor.degrees,
+        'specialty': doctor.specialty,
+        'experience': doctor.experience,
+        'working_at': doctor.workingAt,
+        'fee': doctor.fee,
+        'biography': doctor.biography,
+        'consultLimitPerDay': doctor.consultLimitPerDay ?? 30,
+        if (profilePicUrl != null) 'profilePic': profilePicUrl,
+        if (doctor.languages != null) 'languages': doctor.languages,
+        if (doctor.workingDays != null)
+          'workingDays': doctor.workingDays!.map((d) => d.toJson()).toList(),
+      };
+
+      logger.d('📤 Sending doctor data: $doctorData');
+
       final response = await _apiService.post(
         ApiEndpoints.DOCTORS,
-        data: doctor.toJson(),
+        data: doctorData,
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        await loadDoctors();
+        isLoading.value = false;
+       // Helpers.hideLoadingDialog();
+        clearForm(); // Clear form before navigating back
         Get.back(); // Close form
         Helpers.showSuccessSnackbar('Success', 'Doctor added successfully');
+        loadDoctors(); // Reload in background
       }
     } on DioException catch (e) {
-      Helpers.showErrorSnackbar(
-        'Error',
-        e.response?.data['message'] ?? 'Failed to add doctor',
-      );
-    } finally {
-      Helpers.hideLoadingDialog();
+      isLoading.value = false;
+     // Helpers.hideLoadingDialog();
+      logger.e('❌ DioException: ${e.response?.data}');
+
+      String errorMessage = 'Failed to add doctor';
+
+      if (e.response?.data is Map) {
+        final data = e.response!.data as Map;
+
+        // Handle message as array
+        if (data['message'] is List) {
+          final messages = data['message'] as List;
+          errorMessage = messages.isNotEmpty ? messages.join(', ') : errorMessage;
+        }
+        // Handle message as string
+        else if (data['message'] is String) {
+          errorMessage = data['message'];
+        }
+        // Fallback to error field
+        else if (data['error'] is String) {
+          errorMessage = data['error'];
+        }
+      }
+
+      Helpers.showErrorSnackbar('Error', errorMessage);
+    } catch (e) {
+      isLoading.value = false;
+      //Helpers.hideLoadingDialog();
+      logger.e('❌ Unexpected error: $e');
+      Helpers.showErrorSnackbar('Error', 'An unexpected error occurred');
     }
   }
 
@@ -347,7 +475,7 @@ class DoctorsController extends GetxController {
     if (minExperience.value > 0 || maxExperience.value < 50) count++;
     if (minFee.value > 0 || maxFee.value < 10000) count++;
     if (selectedStatuses.length != 1 || !selectedStatuses.contains('active'))
-      count++;
+        count++;
     return count;
   }
 }
