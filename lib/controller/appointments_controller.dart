@@ -143,6 +143,7 @@ class AppointmentsController extends GetxController {
             doctorSpecialty: appointments[index].doctorSpecialty,
             patientName: appointments[index].patientName,
             patientPhone: appointments[index].patientPhone,
+            patientEmail: appointments[index].patientEmail,
             date: appointments[index].date,
             status: newStatus,
             serialNumber: appointments[index].serialNumber,

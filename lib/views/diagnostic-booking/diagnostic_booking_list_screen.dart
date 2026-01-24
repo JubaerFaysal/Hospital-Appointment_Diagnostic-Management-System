@@ -30,7 +30,7 @@ class _DiagnosticBookingsListScreenState
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(DiagnosticBookingsController());
+    final controller = Get.find<DiagnosticBookingsController>();
 
     return Scaffold(
       body: Row(
@@ -399,7 +399,7 @@ class _DiagnosticBookingsListScreenState
                     Text(
                       '#${booking.id}',
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 16.sp,
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
@@ -423,7 +423,7 @@ class _DiagnosticBookingsListScreenState
                               style: TextStyle(
                                 color: AppColors.warning,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 13.sp,
+                                fontSize: 16.sp,
                               ),
                             ),
                           ),
@@ -435,7 +435,7 @@ class _DiagnosticBookingsListScreenState
                             booking.patientName,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 13.sp,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -448,7 +448,7 @@ class _DiagnosticBookingsListScreenState
                       booking.patientPhone.isNotEmpty
                           ? booking.patientPhone
                           : 'N/A',
-                      style: TextStyle(fontSize: 12.sp),
+                      style: TextStyle(fontSize: 14.sp),
                     ),
                   ),
                   DataCell(
@@ -458,7 +458,7 @@ class _DiagnosticBookingsListScreenState
                         booking.diagnosticName,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -477,7 +477,7 @@ class _DiagnosticBookingsListScreenState
                       child: Text(
                         booking.diagnosticCategory,
                         style: TextStyle(
-                          fontSize: 11.sp,
+                          fontSize: 13.sp,
                           color: AppColors.info,
                           fontWeight: FontWeight.w500,
                         ),
@@ -489,11 +489,11 @@ class _DiagnosticBookingsListScreenState
                       children: [
                         Icon(
                           Icons.calendar_today_rounded,
-                          size: 14.sp,
+                          size: 16.sp,
                           color: AppColors.textSecondary,
                         ),
                         SizedBox(width: 6.w),
-                        Text(formattedDate, style: TextStyle(fontSize: 12.sp)),
+                        Text(formattedDate, style: TextStyle(fontSize: 16.sp)),
                       ],
                     ),
                   ),

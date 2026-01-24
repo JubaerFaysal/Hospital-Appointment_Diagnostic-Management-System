@@ -28,7 +28,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AppointmentsController());
+    final controller = Get.find<AppointmentsController>();
 
     return Scaffold(
       body: Row(
@@ -305,10 +305,9 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen> {
   }
 
   Widget _buildAppointmentsTable(AppointmentsController controller) {
-    return Builder(
-      builder: (context) => Center(
-        child: SingleChildScrollView(
+    return SingleChildScrollView(
           child: Container(
+            width: double.infinity,
             margin: EdgeInsets.only(left: 24.w, right: 24.w, bottom: 24.w),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -322,264 +321,259 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen> {
                 ),
               ],
             ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columnSpacing: 30.w,
-                headingRowColor: WidgetStateProperty.all(AppColors.background),
-                headingTextStyle: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
-                  letterSpacing: 0.5,
-                ),
-                dataTextStyle: TextStyle(
-                  fontSize: 13.sp,
-                  color: AppColors.textPrimary,
-                ),
-                columns: [
-                  DataColumn(label: Text('ID')),
-                  DataColumn(label: Text('Patient')),
-                  DataColumn(label: Text('Doctor')),
-                  DataColumn(label: Text('Date')),
-                  DataColumn(label: Text('Serial #')),
-                  DataColumn(label: Text('Fee')),
-                  DataColumn(label: Text('Status')),
-                  DataColumn(label: Text('Actions')),
-                ],
-                rows: controller.filteredAppointments.map((appointment) {
-                  String formattedDate = 'N/A';
-                  try {
-                    if (appointment.date.isNotEmpty) {
-                      final date = DateTime.parse(appointment.date);
-                      formattedDate = DateFormat('dd MMM yyyy').format(date);
-                    }
-                  } catch (e) {
-                    formattedDate = appointment.date;
+            child: DataTable(
+              columnSpacing: 40.w,
+              headingRowColor: WidgetStateProperty.all(AppColors.background),
+              headingTextStyle: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+                letterSpacing: 0.5,
+              ),
+              dataTextStyle: TextStyle(
+                fontSize: 16.sp,
+                color: AppColors.textPrimary,
+              ),
+              columns: [
+                DataColumn(label: Text('#ID')),
+                DataColumn(label: Text('Patient')),
+                DataColumn(label: Text('Doctor')),
+                DataColumn(label: Text('Date')),
+                DataColumn(label: Text('Serial #')),
+                DataColumn(label: Text('Fee')),
+                DataColumn(label: Text('Status')),
+                DataColumn(label: Text('Actions')),
+              ],
+              rows: controller.filteredAppointments.map((appointment) {
+                String formattedDate = 'N/A';
+                try {
+                  if (appointment.date.isNotEmpty) {
+                    final date = DateTime.parse(appointment.date);
+                    formattedDate = DateFormat('dd MMM yyyy').format(date);
                   }
-
-                  return DataRow(
-                    cells: [
-                      DataCell(
-                        Text(
-                          '#${appointment.id}',
-                          style: TextStyle(
-                            fontSize: 12.sp,
+                } catch (e) {
+                  formattedDate = appointment.date;
+                }
+                return DataRow(
+                  cells: [
+                    DataCell(
+                      Text(
+                        '#${appointment.id}',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Row(
+                        children: [
+                          Container(
+                            width: 36.w,
+                            height: 36.w,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Center(
+                              child: Text(
+                                appointment.patientName.isNotEmpty
+                                    ? appointment.patientName[0].toUpperCase()
+                                    : 'P',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16.sp,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                appointment.patientName,
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              Text(
+                                appointment.patientPhone.isNotEmpty?appointment.patientPhone:appointment.patientEmail,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    DataCell(
+                      Row(
+                        children: [
+                          Container(
+                            width: 36.w,
+                            height: 36.w,
+                            decoration: BoxDecoration(
+                              color: AppColors.secondary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.medical_services_rounded,
+                                color: AppColors.secondary,
+                                size: 18.sp,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                appointment.doctorName,
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              Text(
+                                appointment.doctorSpecialty,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    DataCell(
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today_rounded,
+                            size: 18.sp,
                             color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w500,
                           ),
-                        ),
+                          SizedBox(width: 6.w),
+                          Text(formattedDate),
+                        ],
                       ),
-                      DataCell(
-                        Row(
-                          children: [
-                            Container(
-                              width: 36.w,
-                              height: 36.w,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  appointment.patientName.isNotEmpty
-                                      ? appointment.patientName[0].toUpperCase()
-                                      : 'P',
-                                  style: TextStyle(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14.sp,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 10.w),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  appointment.patientName,
-                                  style: TextStyle(
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                Text(
-                                  appointment.patientPhone,
-                                  style: TextStyle(
-                                    fontSize: 11.sp,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                    ),
+                    DataCell(
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 4.h,
                         ),
-                      ),
-                      DataCell(
-                        Row(
-                          children: [
-                            Container(
-                              width: 36.w,
-                              height: 36.w,
-                              decoration: BoxDecoration(
-                                color: AppColors.secondary.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.medical_services_rounded,
-                                  color: AppColors.secondary,
-                                  size: 16.sp,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 10.w),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  appointment.doctorName,
-                                  style: TextStyle(
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                Text(
-                                  appointment.doctorSpecialty,
-                                  style: TextStyle(
-                                    fontSize: 11.sp,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6.r),
                         ),
-                      ),
-                      DataCell(
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today_rounded,
-                              size: 14.sp,
-                              color: AppColors.textSecondary,
-                            ),
-                            SizedBox(width: 6.w),
-                            Text(formattedDate),
-                          ],
-                        ),
-                      ),
-                      DataCell(
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 4.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6.r),
-                          ),
-                          child: Text(
-                            appointment.serialNumber != null
-                                ? '#${appointment.serialNumber}'
-                                : 'N/A',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ),
-                      ),
-                      DataCell(
-                        Text(
-                          appointment.fee != null
-                              ? '৳${appointment.fee!.toStringAsFixed(0)}'
+                        child: Text(
+                          appointment.serialNumber != null
+                              ? '#${appointment.serialNumber}'
                               : 'N/A',
                           style: TextStyle(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.success,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
-                      DataCell(StatusBadge(status: appointment.status)),
-                      DataCell(
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.visibility_rounded,
-                                  color: AppColors.primary,
-                                  size: 18.sp,
-                                ),
-                                onPressed: () => _showAppointmentDetails(
-                                  context,
-                                  appointment,
-                                ),
-                                tooltip: 'View Details',
-                              ),
-                            ),
-                            SizedBox(width: 4.w),
-                            PopupMenuButton<String>(
-                              icon: Icon(
-                                Icons.more_vert_rounded,
-                                color: AppColors.textSecondary,
-                                size: 20.sp,
-                              ),
-                              tooltip: 'Actions',
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.r),
-                              ),
-                              onSelected: (value) => _handleAction(
-                                controller,
-                                value,
-                                appointment.id,
-                                appointment.status,
-                              ),
-                              itemBuilder: (context) =>
-                                  _buildActionMenuItems(appointment.status),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.error.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.delete_rounded,
-                                  color: AppColors.error,
-                                  size: 18.sp,
-                                ),
-                                onPressed: () => controller.deleteAppointment(
-                                  appointment.id,
-                                ),
-                                tooltip: 'Delete',
-                              ),
-                            ),
-                          ],
+                    ),
+                    DataCell(
+                      Text(
+                        appointment.fee != null
+                            ? '৳${appointment.fee!.toStringAsFixed(0)}'
+                            : 'N/A',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.success,
                         ),
                       ),
-                    ],
-                  );
-                }).toList(),
-              ),
+                    ),
+                    DataCell(StatusBadge(status: appointment.status)),
+                    DataCell(
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.visibility_rounded,
+                                color: AppColors.primary,
+                                size: 20.sp,
+                              ),
+                              onPressed: () => _showAppointmentDetails(
+                                context,
+                                appointment,
+                              ),
+                              tooltip: 'View Details',
+                            ),
+                          ),
+                          SizedBox(width: 4.w),
+                          PopupMenuButton<String>(
+                            icon: Icon(
+                              Icons.more_vert_rounded,
+                              color: AppColors.textSecondary,
+                              size: 20.sp,
+                            ),
+                            tooltip: 'Actions',
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            onSelected: (value) => _handleAction(
+                              controller,
+                              value,
+                              appointment.id,
+                              appointment.status,
+                            ),
+                            itemBuilder: (context) =>
+                                _buildActionMenuItems(appointment.status),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.delete_rounded,
+                                color: AppColors.error,
+                                size: 18.sp,
+                              ),
+                              onPressed: () => controller.deleteAppointment(
+                                appointment.id,
+                              ),
+                              tooltip: 'Delete',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
             ),
           ),
-        ),
-      ),
-    );
+        );
+
   }
 
   List<PopupMenuEntry<String>> _buildActionMenuItems(String currentStatus) {

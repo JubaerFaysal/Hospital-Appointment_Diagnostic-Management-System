@@ -1,6 +1,12 @@
 import 'package:get/get.dart';
 
+import '../bindings/analytics_binding.dart';
+import '../bindings/appointments_binding.dart';
+import '../bindings/dashboard_binding.dart';
+import '../bindings/diagnostic_booking_binding.dart';
+import '../bindings/diagnostics_binding.dart';
 import '../bindings/doctor_bindings.dart';
+import '../bindings/users_binding.dart';
 import '../views/analytics/analytics_screen.dart';
 import '../views/analytics/dashboard_screen.dart';
 import '../views/appointments_list_screen.dart';
@@ -19,8 +25,16 @@ import 'admin_routes.dart';
 class AdminPages {
   static final routes = [
     GetPage(name: AdminRoutes.LOGIN, page: () => const LoginScreen()),
-    GetPage(name: AdminRoutes.DASHBOARD, page: () => const DashboardScreen()),
-    GetPage(name: AdminRoutes.DOCTORS, page: () => const DoctorsListScreen(), binding: DoctorsBinding(),),
+    GetPage(
+      name: AdminRoutes.DASHBOARD,
+      page: () => const DashboardScreen(),
+      binding: DashboardBinding(),
+    ),
+    GetPage(
+      name: AdminRoutes.DOCTORS,
+      page: () => const DoctorsListScreen(),
+      binding: DoctorsBinding(),
+    ),
     GetPage(name: AdminRoutes.DOCTORS_ADD, page: () => const AddDoctorScreen()),
     GetPage(
       name: AdminRoutes.DOCTORS_EDIT,
@@ -33,10 +47,12 @@ class AdminPages {
     GetPage(
       name: AdminRoutes.DIAGNOSTICS,
       page: () => const DiagnosticsListScreen(),
+      binding: DiagnosticsBinding(),
     ),
     GetPage(
       name: AdminRoutes.DIAGNOSTIC_BOOKINGS,
       page: () => const DiagnosticBookingsListScreen(),
+      binding: DiagnosticBookingBinding(),
     ),
     GetPage(
       name: AdminRoutes.DIAGNOSTICS_ADD,
@@ -44,13 +60,22 @@ class AdminPages {
     ),
     GetPage(
       name: AdminRoutes.DIAGNOSTICS_EDIT,
-      page: () =>  EditDiagnosticScreen(),
+      page: () => EditDiagnosticScreen(),
     ),
     GetPage(
       name: AdminRoutes.APPOINTMENTS,
       page: () => const AppointmentsListScreen(),
+      binding: AppointmentsBinding(),
     ),
-    GetPage(name: AdminRoutes.USERS, page: () => const UsersListScreen()),
-    GetPage(name: AdminRoutes.ANALYTICS, page: () => const AnalyticsScreen()),
+    GetPage(
+      name: AdminRoutes.USERS,
+      page: () => const UsersListScreen(),
+      binding: UsersBinding(),
+    ),
+    GetPage(
+      name: AdminRoutes.ANALYTICS,
+      page: () => const AnalyticsScreen(),
+      binding: AnalyticsBinding(),
+    ),
   ];
 }

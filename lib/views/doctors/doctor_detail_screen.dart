@@ -509,7 +509,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                     label: Text('Patient', style: AppTextStyles.subtitle1),
                   ),
                   DataColumn(
-                    label: Text('Phone', style: AppTextStyles.subtitle1),
+                    label: Text('Phone/Email', style: AppTextStyles.subtitle1),
                   ),
                   DataColumn(
                     label: Text('Status', style: AppTextStyles.subtitle1),
@@ -531,7 +531,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                       ),
                       DataCell(Text(_formatDate(appointment.date))),
                       DataCell(Text(appointment.patientName)),
-                      DataCell(Text(appointment.patientPhone)),
+                      DataCell(Text(appointment.patientPhone.isNotEmpty?appointment.patientPhone:appointment.patientEmail)),
                       DataCell(_buildStatusBadge(appointment.status)),
                     ],
                   );

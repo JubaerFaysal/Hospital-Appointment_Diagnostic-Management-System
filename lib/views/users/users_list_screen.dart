@@ -15,7 +15,7 @@ class UsersListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(UsersController());
+    final controller = Get.find<UsersController>();
 
     return Scaffold(
       body: Row(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:get/get.dart';
+import '../../controller/analytics_controller.dart';
 import '../../routes/admin_routes.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_text_styles.dart';
@@ -12,6 +14,8 @@ class AnalyticsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<AnalyticsController>();
+
     return Scaffold(
       body: Row(
         children: [
@@ -37,7 +41,7 @@ class AnalyticsScreen extends StatelessWidget {
                           SizedBox(height: 24.h),
 
                           // Monthly Stats
-                          _buildStatsGrid(),
+                          _buildStatsGrid(controller),
 
                           SizedBox(height: 32.h),
 
@@ -138,7 +142,7 @@ class AnalyticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsGrid() {
+  Widget _buildStatsGrid(controller) {
     return GridView.count(
       crossAxisCount: 4,
       shrinkWrap: true,
@@ -147,30 +151,30 @@ class AnalyticsScreen extends StatelessWidget {
       mainAxisSpacing: 20.h,
       childAspectRatio: 1.8,
       children: [
-        DashboardCard(
+        Obx(() => DashboardCard(
           title: 'Monthly Revenue',
-          value: '৳1,24,500',
+          value: controller.monthlyRevenue.value,
           icon: Icons.attach_money,
           color: AppColors.success,
-        ),
-        DashboardCard(
+        )),
+        Obx(() => DashboardCard(
           title: 'Total Appointments',
-          value: '248',
+          value: controller.totalAppointments.value,
           icon: Icons.calendar_month,
           color: AppColors.primary,
-        ),
-        DashboardCard(
+        )),
+        Obx(() => DashboardCard(
           title: 'Tests Conducted',
-          value: '156',
+          value: controller.testsConducted.value,
           icon: Icons.science,
           color: AppColors.secondary,
-        ),
-        DashboardCard(
+        )),
+        Obx(() => DashboardCard(
           title: 'Patient Satisfaction',
-          value: '94%',
+          value: controller.patientSatisfaction.value,
           icon: Icons.sentiment_satisfied_alt,
           color: AppColors.warning,
-        ),
+        )),
       ],
     );
   }

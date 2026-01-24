@@ -30,7 +30,7 @@ class AddDiagnosticScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(DiagnosticsController());
+    final controller = Get.find<DiagnosticsController>();
     final formKey = GlobalKey<FormState>();
 
     return Scaffold(

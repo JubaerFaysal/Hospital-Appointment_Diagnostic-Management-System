@@ -12,7 +12,7 @@ class DiagnosticsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(DiagnosticsController());
+    final controller = Get.find<DiagnosticsController>();
 
     return Scaffold(
       body: Row(
