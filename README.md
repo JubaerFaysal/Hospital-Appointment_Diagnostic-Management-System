@@ -126,15 +126,23 @@ hospital-management-system/
 ```
 ## 📸 Screenshots
 
+### Admin Web Panel
+![Admin Login](screenshots/login.png)
+![Admin Dashboard](screenshots/dashboard.png)
+![Doctors](screenshots/doctors.png)
+![Doctor Details](screenshots/doctor_details.png)
+![Diagnostics](screenshots/diagnostics.png)
+![Diagnostics Bookings](screenshots/bookings.png)
+![Diagnostic Bookings Details](screenshots/diagnostic_details.png)
+![Appointment](screenshots/appointments.png)
+![Appointment Details](screenshots/appointment_details.png)
+
 ### Patient Mobile App
 ![Patient App Home](screenshots/patient_home.png)
 ![Book Appointment](screenshots/patient_booking.png)
 
 ### Doctor Mobile App
 ![Doctor Schedule](screenshots/doctor_schedule.png)
-
-### Admin Web Panel
-![Admin Dashboard](screenshots/admin_dashboard.png)
 
 
 ## 🚀 Installation & Setup

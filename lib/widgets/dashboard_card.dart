@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/app_colors.dart';
 
-class DashboardCard extends StatefulWidget {
+class DashboardCard extends StatelessWidget {
   final String title;
   final String value;
   final String? subtitle;
@@ -14,7 +14,7 @@ class DashboardCard extends StatefulWidget {
   final bool isPositiveTrend;
 
   const DashboardCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.value,
     this.subtitle,
@@ -24,156 +24,137 @@ class DashboardCard extends StatefulWidget {
     this.onTap,
     this.trend,
     this.isPositiveTrend = true,
-  }) : super(key: key);
-
-  @override
-  State<DashboardCard> createState() => _DashboardCardState();
-}
-
-class _DashboardCardState extends State<DashboardCard> {
-  bool isHovered = false;
+  });
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => isHovered = true),
-      onExit: (_) => setState(() => isHovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          transform: Matrix4.identity()..translate(0.0, isHovered ? -4.0 : 0.0),
-          padding: EdgeInsets.all(20.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(
-              color: isHovered
-                  ? widget.color.withOpacity(0.3)
-                  : AppColors.border,
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: isHovered
-                    ? widget.color.withOpacity(0.15)
-                    : Colors.black.withOpacity(0.04),
-                blurRadius: isHovered ? 20 : 12,
-                offset: Offset(0, isHovered ? 8 : 4),
-              ),
-            ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: AppColors.border,
+            width: 1,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      gradient:
-                          widget.gradient ??
-                          LinearGradient(
-                            colors: [
-                              widget.color.withOpacity(0.15),
-                              widget.color.withOpacity(0.05),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Icon(widget.icon, color: widget.color, size: 24.sp),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(12.w),
+                  decoration: BoxDecoration(
+                    gradient: gradient ??
+                        LinearGradient(
+                          colors: [
+                            color.withOpacity(0.15),
+                            color.withOpacity(0.05),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
-                  if (widget.trend != null)
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: widget.isPositiveTrend
-                            ? AppColors.success.withOpacity(0.1)
-                            : AppColors.danger.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            widget.isPositiveTrend
-                                ? Icons.trending_up_rounded
-                                : Icons.trending_down_rounded,
-                            color: widget.isPositiveTrend
+                  child: Icon(icon, color: color, size: 24.sp),
+                ),
+                if (trend != null)
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 4.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isPositiveTrend
+                          ? AppColors.success.withOpacity(0.1)
+                          : AppColors.danger.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isPositiveTrend
+                              ? Icons.trending_up_rounded
+                              : Icons.trending_down_rounded,
+                          color: isPositiveTrend
+                              ? AppColors.success
+                              : AppColors.danger,
+                          size: 12.sp,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          trend!,
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w600,
+                            color: isPositiveTrend
                                 ? AppColors.success
                                 : AppColors.danger,
-                            size: 12.sp,
                           ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            widget.trend!,
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.w600,
-                              color: widget.isPositiveTrend
-                                  ? AppColors.success
-                                  : AppColors.danger,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (widget.subtitle != null && widget.trend == null)
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: widget.color.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      child: Text(
-                        widget.subtitle!,
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: widget.color,
-                          fontWeight: FontWeight.w600,
                         ),
+                      ],
+                    ),
+                  ),
+                if (subtitle != null && trend == null)
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                      vertical: 4.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Text(
+                      subtitle!,
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: color,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                ],
-              ),
-              SizedBox(height: 16.h),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.value,
-                    style: TextStyle(
-                      fontSize: 28.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                      height: 1,
-                    ),
                   ),
-                  SizedBox(height: 6.h),
-                  Text(
-                    widget.title,
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
+              ],
+            ),
+            SizedBox(height: 16.h),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                    height: 1,
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+                SizedBox(height: 6.h),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

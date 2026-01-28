@@ -6,7 +6,6 @@ import '../../controller/doctor_controller.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_text_styles.dart';
 import '../../widgets/admin_sidebar.dart';
-import '../../widgets/doctor_filter_panel.dart';
 
 class DoctorsListScreen extends GetView<DoctorsController> {
   const DoctorsListScreen({super.key});
@@ -44,13 +43,6 @@ class DoctorsListScreen extends GetView<DoctorsController> {
                       ],
                     ),
                   ),
-                  // Filter Panel
-                  Obx(() {
-                    if (controller.showFilters.value) {
-                      return const DoctorFilterPanel();
-                    }
-                    return const SizedBox.shrink();
-                  }),
                 ],
               ),
             ),
@@ -73,178 +65,61 @@ class DoctorsListScreen extends GetView<DoctorsController> {
           ),
         ],
       ),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Doctors Management',
-                    style: AppTextStyles.h3.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Obx(
-                    () => Text(
-                      '${controller.filteredDoctors.length} doctors found',
-                      style: AppTextStyles.body2.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                ],
+              Text(
+                'Doctors Management',
+                style: AppTextStyles.h3.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              Row(
-                children: [
-                  // Filter Toggle Button
-                  Obx(
-                    () => OutlinedButton.icon(
-                      onPressed: controller.toggleFilters,
-                      icon: Icon(
-                        controller.showFilters.value
-                            ? Icons.filter_list_off
-                            : Icons.filter_list,
-                        size: 18.sp,
-                      ),
-                      label: Text(
-                        controller.showFilters.value
-                            ? 'Hide Filters'
-                            : 'Show Filters',
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20.w,
-                          vertical: 14.h,
-                        ),
-                        side: BorderSide(
-                          color: controller.activeFilterCount > 0
-                              ? AppColors.primary
-                              : Colors.grey[300]!,
-                        ),
-                      ),
-                    ),
+              SizedBox(height: 4.h),
+              Obx(
+                () => Text(
+                  '${controller.filteredDoctors.length} doctors found',
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppColors.textSecondary,
                   ),
-                  SizedBox(width: 12.w),
-                  // Search Field
-                  SizedBox(
-                    width: 300.w,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search doctors...',
-                        prefixIcon: const Icon(Icons.search),
-                        isDense: true,
-                        filled: true,
-                        fillColor: AppColors.background,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.r),
-                          borderSide: BorderSide.none,
-                        ),
-                        // contentPadding: EdgeInsets.symmetric(
-                        //   horizontal: 16.w,
-                        //   vertical: 12.h,
-                        // ),
-                      ),
-                      onChanged: controller.searchDoctors,
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  // Add Doctor Button
-                  ElevatedButton.icon(
-                    onPressed: () => Get.toNamed('/doctors/add'),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add Doctor'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 24.w,
-                        vertical: 16.h,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
-          SizedBox(height: 16.h),
-          // Quick Filters and Sorting
           Row(
             children: [
-              // View Mode Chips
-              Obx(
-                () => _buildViewModeChip(
-                  'All Doctors',
-                  controller.doctors.length,
-                  controller.filteredDoctors.length ==
-                      controller.doctors.length,
-                  () {
-                    controller.clearFilters();
-                  },
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Obx(
-                () => _buildViewModeChip(
-                  'With Appointments',
-                  controller.doctorsWithAppointments.length,
-                  false,
-                  () {
-                    controller.loadDoctorsWithAppointments();
-                  },
-                ),
-              ),
-              SizedBox(width: 12.w),
-              if (controller.isLoadingDoctorsWithAppointments.value)
-                const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              const Spacer(),
-              // Sort Dropdown
-              Text(
-                'Sort by:',
-                style: AppTextStyles.body2.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Obx(
-                () => DropdownButton<String>(
-                  value: controller.sortBy.value,
-                  underline: const SizedBox.shrink(),
-                  items: const [
-                    DropdownMenuItem(value: 'name', child: Text('Name')),
-                    DropdownMenuItem(
-                      value: 'experience',
-                      child: Text('Experience'),
+              // Search Field
+              SizedBox(
+                width: 300.w,
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search doctors...',
+                    prefixIcon: const Icon(Icons.search),
+                    isDense: true,
+                    filled: true,
+                    fillColor: AppColors.background,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                      borderSide: BorderSide.none,
                     ),
-                    DropdownMenuItem(value: 'fee', child: Text('Fee')),
-                    DropdownMenuItem(value: 'status', child: Text('Status')),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) {
-                      controller.changeSortBy(value);
-                    }
-                  },
+                  ),
+                  onChanged: controller.searchDoctors,
                 ),
               ),
-              SizedBox(width: 8.w),
-              Obx(
-                () => IconButton(
-                  icon: Icon(
-                    controller.sortAscending.value
-                        ? Icons.arrow_upward
-                        : Icons.arrow_downward,
-                    size: 20.sp,
+              SizedBox(width: 12.w),
+              // Add Doctor Button
+              ElevatedButton.icon(
+                onPressed: () => Get.toNamed('/doctors/add'),
+                icon: const Icon(Icons.add),
+                label: const Text('Add Doctor'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                    vertical: 16.h,
                   ),
-                  onPressed: () => controller.toggleSortDirection(),
-                  tooltip: controller.sortAscending.value
-                      ? 'Ascending'
-                      : 'Descending',
                 ),
               ),
             ],
@@ -254,56 +129,7 @@ class DoctorsListScreen extends GetView<DoctorsController> {
     );
   }
 
-  Widget _buildViewModeChip(
-    String label,
-    int count,
-    bool isActive,
-    VoidCallback onTap,
-  ) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          color: isActive
-              ? AppColors.primary.withOpacity(0.1)
-              : Colors.grey[100],
-          borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(
-            color: isActive ? AppColors.primary : Colors.grey[300]!,
-            width: isActive ? 2 : 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: AppTextStyles.body2.copyWith(
-                color: isActive ? AppColors.primary : AppColors.textSecondary,
-                fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
-              ),
-            ),
-            SizedBox(width: 8.w),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-              decoration: BoxDecoration(
-                color: isActive ? AppColors.primary : Colors.grey[400],
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Text(
-                count.toString(),
-                style: AppTextStyles.caption.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   Widget _buildDoctorsTable(DoctorsController controller) {
     return Container(

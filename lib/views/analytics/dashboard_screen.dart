@@ -209,7 +209,6 @@ class DashboardScreen extends StatelessWidget {
         DashboardCard(
           title: 'Total Doctors',
           value: controller.stats['totalDoctors'].toString(),
-          subtitle: '${controller.stats['activeDoctors']} active',
           icon: Icons.medical_services_rounded,
           color: AppColors.primary,
           onTap: () => Get.toNamed('/doctors'),

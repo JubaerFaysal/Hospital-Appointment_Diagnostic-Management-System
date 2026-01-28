@@ -61,10 +61,8 @@ class MyApp extends StatelessWidget {
           transitionDuration: const Duration(milliseconds: 300),
           builder: (context, widget) {
             return MediaQuery(
-              data: MediaQuery.of(
-                context,
-              ).copyWith(textScaler: TextScaler.linear(1.0)),
-              child: widget!,
+              data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
+              child: widget ?? const SizedBox.shrink(),
             );
           },
         );
