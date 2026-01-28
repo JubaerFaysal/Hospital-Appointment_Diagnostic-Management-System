@@ -124,6 +124,18 @@ hospital-management-system/
     ├── schema.sql
     └── sample_data.sql
 ```
+## 📸 Screenshots
+
+### Patient Mobile App
+![Patient App Home](screenshots/patient_home.png)
+![Book Appointment](screenshots/patient_booking.png)
+
+### Doctor Mobile App
+![Doctor Schedule](screenshots/doctor_schedule.png)
+
+### Admin Web Panel
+![Admin Dashboard](screenshots/admin_dashboard.png)
+
 
 ## 🚀 Installation & Setup
 
